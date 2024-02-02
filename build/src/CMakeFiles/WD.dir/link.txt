@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/WD.dir/WD.c.o -o ../../bin/WD  ../headers/libwrapFunc.a ../headers/libutils.a 

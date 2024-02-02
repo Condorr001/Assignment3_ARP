@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/map.dir/map.c.o -o ../../bin/map  ../headers/libwrapFunc.a -lm ../headers/libutils.a -lcurses /usr/lib/x86_64-linux-gnu/libform.so 

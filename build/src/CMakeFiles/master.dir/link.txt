@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/master.dir/master.c.o -o ../../bin/master  ../headers/libwrapFunc.a ../headers/libutils.a 

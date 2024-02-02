@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/obstacles.dir/obstacles.c.o -o ../../bin/obstacles  ../headers/libwrapFunc.a ../headers/libutils.a 
