@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
             select_timeout.tv_sec  = OBSTACLES_SPAWN_PERIOD;
             select_timeout.tv_usec = 0;
 
-            //TO ADD: if STOP for server is received, break
+            //TO DO: if STOP for server is received, break
         }
     }
 

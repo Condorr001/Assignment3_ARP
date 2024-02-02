@@ -169,3 +169,178 @@
 [INFO] - WD sending signal to 30557
 [INFO] - WD sending signal to 30560
 [INFO] - WD sending signal to 30561
+[INFO] - Obstacles process generated a new set of obstacles
+[INFO] - vvvvvvvvDRONE-TARGvvvvvvv
+[INFO] - 60.000,333.000
+[INFO] - 185.000,253.000
+[INFO] - 157.000,285.000
+[INFO] - 299.000,327.000
+[INFO] - 407.000,38.000
+[INFO] - 243.000,44.000
+[INFO] - 446.000,369.000
+[INFO] - 431.000,240.000
+[INFO] - 229.000,404.000
+[INFO] - 425.000,308.000
+[INFO] - ^^^^^^^^DRONE-TARG^^^^^^^
+[INFO] - vvvvvvvvDRONE-OBSTvvvvvvv
+[INFO] - 93.000,368.000
+[INFO] - 163.000,372.000
+[INFO] - 347.000,265.000
+[INFO] - 25.000,336.000
+[INFO] - 383.000,461.000
+[INFO] - 32.000,62.000
+[INFO] - 366.000,225.000
+[INFO] - 346.000,147.000
+[INFO] - 129.000,49.000
+[INFO] - 155.000,43.000
+[INFO] - ^^^^^^^^DRONE-OBST^^^^^^^
+[INFO] - WD sending signal to 31135
+[INFO] - WD sending signal to 31137
+[INFO] - WD sending signal to 31068
+[INFO] - WD sending signal to 31069
+[INFO] - vvvvvvvvvvvTARGETSvvvvvvvvvvvvvvv
+[INFO] - 60.000,333.000
+[INFO] - 185.000,253.000
+[INFO] - 157.000,285.000
+[INFO] - 299.000,327.000
+[INFO] - 407.000,38.000
+[INFO] - 243.000,44.000
+[INFO] - 446.000,369.000
+[INFO] - 431.000,240.000
+[INFO] - 229.000,404.000
+[INFO] - 425.000,308.000
+[INFO] - ^^^^^^^^^^^TARGETS^^^^^^^^^^^^^^^
+[INFO] - Targets 10
+[INFO] - vvvvvvvvvvvOBSTACLESvvvvvvvvvvvvvvv
+[INFO] - 93.000,368.000
+[INFO] - 163.000,372.000
+[INFO] - 347.000,265.000
+[INFO] - 25.000,336.000
+[INFO] - 383.000,461.000
+[INFO] - 32.000,62.000
+[INFO] - 366.000,225.000
+[INFO] - 346.000,147.000
+[INFO] - 129.000,49.000
+[INFO] - 155.000,43.000
+[INFO] - ^^^^^^^^^^^OBSTACLES^^^^^^^^^^^^^^^
+[INFO] - Obtacles 10
+[INFO] - WD sending signal to 31072
+[INFO] - WD sending signal to 31073
+[INFO] - WD sending signal to 31135
+[INFO] - WD sending signal to 31137
+[INFO] - WD sending signal to 31068
+[INFO] - WD sending signal to 31069
+[INFO] - WD sending signal to 31072
+[INFO] - WD sending signal to 31073
+[INFO] - WD sending signal to 31135
+[INFO] - WD sending signal to 31137
+[INFO] - WD sending signal to 31068
+[INFO] - WD sending signal to 31069
+[INFO] - WD sending signal to 31072
+[INFO] - Input has updated its parameters
+[INFO] - WD sending signal to 31073
+[INFO] - WD sending signal to 31135
+[INFO] - WD sending signal to 31137
+[INFO] - WD sending signal to 31068
+[INFO] - Drone has updated its parameters
+[INFO] - WD sending signal to 31069
+[INFO] - WD sending signal to 31072
+[INFO] - WD sending signal to 31073
+[INFO] - WD sending signal to 31135
+[INFO] - WD sending signal to 31137
+[INFO] - WD sending signal to 31068
+[INFO] - WD sending signal to 31069
+[INFO] - WD sending signal to 31072
+[INFO] - WD sending signal to 31073
+[INFO] - WD sending signal to 31135
+[INFO] - WD sending signal to 31137
+[INFO] - WD sending signal to 31068
+[INFO] - WD sending signal to 31069
+[INFO] - WD sending signal to 31072
+[INFO] - Input has updated its parameters
+[INFO] - WD sending signal to 31073
+[INFO] - Obstacles process generated a new set of obstacles
+[INFO] - vvvvvvvvvvvOBSTACLESvvvvvvvvvvvvvvv
+[INFO] - 368.000,310.000
+[INFO] - 427.000,268.000
+[INFO] - 123.000,191.000
+[INFO] - 125.000,452.000
+[INFO] - 388.000,114.000
+[INFO] - 497.000,482.000
+[INFO] - 334.000,13.000
+[INFO] - 354.000,182.000
+[INFO] - 130.000,231.000
+[INFO] - 370.000,13.000
+[INFO] - ^^^^^^^^^^^OBSTACLES^^^^^^^^^^^^^^^
+[INFO] - Obtacles 10
+[INFO] - vvvvvvvvDRONE-OBSTvvvvvvv
+[INFO] - 368.000,310.000
+[INFO] - 427.000,268.000
+[INFO] - 123.000,191.000
+[INFO] - 125.000,452.000
+[INFO] - 388.000,114.000
+[INFO] - 497.000,482.000
+[INFO] - 334.000,13.000
+[INFO] - 354.000,182.000
+[INFO] - 130.000,231.000
+[INFO] - 370.000,13.000
+[INFO] - ^^^^^^^^DRONE-OBST^^^^^^^
+[INFO] - WD sending signal to 31135
+[INFO] - Drone has updated its parameters
+[INFO] - WD sending signal to 31137
+[INFO] - WD sending signal to 31068
+[INFO] - WD sending signal to 31069
+[INFO] - TH|5|243.000,44.000
+[INFO] - WD sending signal to 31072
+[INFO] - WD sending signal to 31073
+[INFO] - WD sending signal to 31135
+[INFO] - Input has updated its parameters
+[INFO] - WD sending signal to 31137
+[INFO] - WD sending signal to 31068
+[INFO] - WD sending signal to 31069
+[INFO] - WD sending signal to 31072
+[INFO] - WD sending signal to 31073
+[INFO] - WD sending signal to 31135
+[INFO] - Drone has updated its parameters
+[INFO] - Input has updated its parameters
+[INFO] - WD sending signal to 31137
+[INFO] - WD sending signal to 31068
+[INFO] - WD sending signal to 31069
+[INFO] - TH|0|60.000,333.000
+[INFO] - WD sending signal to 31072
+[INFO] - WD sending signal to 31073
+[INFO] - WD sending signal to 31135
+[INFO] - WD sending signal to 31137
+[INFO] - Obstacles process generated a new set of obstacles
+[INFO] - vvvvvvvvDRONE-OBSTvvvvvvv
+[ERROR] - Error on executing connect: Connection refused, pid: 31416, from: /home/condor001/Documenti/GitHub/Assignment3_ARP/headers/wrapFuncs/wrapFunc.c, line: 606, awaiting termination from WD
+[INFO] - 58.000,334.000
+[INFO] - 72.000,1.000
+[INFO] - 324.000,36.000
+[INFO] - 199.000,234.000
+[INFO] - 26.000,80.000
+[INFO] - 147.000,259.000
+[INFO] - 139.000,259.000
+[INFO] - 100.000,88.000
+[INFO] - 331.000,380.000
+[INFO] - 400.000,457.000
+[INFO] - ^^^^^^^^DRONE-OBST^^^^^^^
+[INFO] - WD sending signal to 31480
+[INFO] - vvvvvvvvvvvOBSTACLESvvvvvvvvvvvvvvv
+[INFO] - 58.000,334.000
+[INFO] - 72.000,1.000
+[INFO] - 324.000,36.000
+[INFO] - 199.000,234.000
+[INFO] - 26.000,80.000
+[INFO] - 147.000,259.000
+[INFO] - 139.000,259.000
+[INFO] - 100.000,88.000
+[INFO] - 331.000,380.000
+[INFO] - 400.000,457.000
+[INFO] - ^^^^^^^^^^^OBSTACLES^^^^^^^^^^^^^^^
+[INFO] - Obtacles 10
+[INFO] - WD sending signal to 31478
+[INFO] - WD sending signal to 31412
+[INFO] - WD sending signal to 31413
+[INFO] - WD sending signal to 31416
+[WARN] - WD killed all processes because of process with pid 31416
