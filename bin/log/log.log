@@ -1,0 +1,171 @@
+[ERROR] - Error on executing connect: Connection refused, pid: 27582, from: /home/condor001/Documenti/GitHub/Assignment3_ARP/headers/wrapFuncs/wrapFunc.c, line: 606, awaiting termination from WD
+[INFO] - vvvvvvvvDRONE-TARGvvvvvvv
+[INFO] - 414.000,211.000
+[INFO] - 199.000,430.000
+[INFO] - 348.000,215.000
+[INFO] - 486.000,343.000
+[INFO] - 376.000,55.000
+[INFO] - 144.000,30.000
+[INFO] - 243.000,345.000
+[INFO] - 325.000,368.000
+[INFO] - 136.000,207.000
+[INFO] - 382.000,224.000
+[INFO] - ^^^^^^^^DRONE-TARG^^^^^^^
+[INFO] - WD sending signal to 27650
+[INFO] - WD sending signal to 27648
+[INFO] - vvvvvvvvvvvTARGETSvvvvvvvvvvvvvvv
+[INFO] - 414.000,211.000
+[INFO] - 199.000,430.000
+[INFO] - 348.000,215.000
+[INFO] - 486.000,343.000
+[INFO] - 376.000,55.000
+[INFO] - 144.000,30.000
+[INFO] - 243.000,345.000
+[INFO] - 325.000,368.000
+[INFO] - 136.000,207.000
+[INFO] - 382.000,224.000
+[INFO] - ^^^^^^^^^^^TARGETS^^^^^^^^^^^^^^^
+[INFO] - Targets 10
+[INFO] - WD sending signal to 27577
+[INFO] - WD sending signal to 27578
+[INFO] - WD sending signal to 27581
+[INFO] - WD sending signal to 27582
+[WARN] - WD killed all processes because of process with pid 27582
+[ERROR] - Error on executing execvp: No such file or directory, pid: 29886, from: /home/condor001/Documenti/GitHub/Assignment3_ARP/headers/wrapFuncs/wrapFunc.c, line: 68, awaiting termination from WD
+[INFO] - vvvvvvvvDRONE-TARGvvvvvvv
+[INFO] - 53.000,71.000
+[INFO] - 18.000,17.000
+[INFO] - 346.000,3.000
+[INFO] - 246.000,250.000
+[INFO] - 495.000,109.000
+[INFO] - 393.000,292.000
+[INFO] - 14.000,499.000
+[INFO] - 473.000,88.000
+[INFO] - 156.000,175.000
+[INFO] - 346.000,320.000
+[INFO] - ^^^^^^^^DRONE-TARG^^^^^^^
+[INFO] - WD sending signal to 29952
+[INFO] - vvvvvvvvvvvTARGETSvvvvvvvvvvvvvvv
+[INFO] - 53.000,71.000
+[INFO] - 18.000,17.000
+[INFO] - 346.000,3.000
+[INFO] - 246.000,250.000
+[INFO] - 495.000,109.000
+[INFO] - 393.000,292.000
+[INFO] - 14.000,499.000
+[INFO] - 473.000,88.000
+[INFO] - 156.000,175.000
+[INFO] - 346.000,320.000
+[INFO] - ^^^^^^^^^^^TARGETS^^^^^^^^^^^^^^^
+[INFO] - Targets 10
+[INFO] - TH|1|18.000,17.000
+[INFO] - WD sending signal to 29950
+[INFO] - WD sending signal to 29881
+[INFO] - WD sending signal to 29882
+[INFO] - WD sending signal to 29885
+[INFO] - WD sending signal to 29886
+[WARN] - WD killed all processes because of process with pid 29886
+[ERROR] - Error on executing connect: Connection refused, pid: 30220, from: /home/condor001/Documenti/GitHub/Assignment3_ARP/headers/wrapFuncs/wrapFunc.c, line: 606, awaiting termination from WD
+[INFO] - vvvvvvvvDRONE-TARGvvvvvvv
+[INFO] - 39.000,19.000
+[INFO] - 282.000,310.000
+[INFO] - 159.000,372.000
+[INFO] - 139.000,19.000
+[INFO] - 433.000,493.000
+[INFO] - 284.000,453.000
+[INFO] - 464.000,64.000
+[INFO] - 426.000,277.000
+[INFO] - 459.000,454.000
+[INFO] - 14.000,89.000
+[INFO] - ^^^^^^^^DRONE-TARG^^^^^^^
+[INFO] - WD sending signal to 30281
+[INFO] - vvvvvvvvvvvTARGETSvvvvvvvvvvvvvvv
+[INFO] - 39.000,19.000
+[INFO] - 282.000,310.000
+[INFO] - 159.000,372.000
+[INFO] - 139.000,19.000
+[INFO] - 433.000,493.000
+[INFO] - 284.000,453.000
+[INFO] - 464.000,64.000
+[INFO] - 426.000,277.000
+[INFO] - 459.000,454.000
+[INFO] - 14.000,89.000
+[INFO] - ^^^^^^^^^^^TARGETS^^^^^^^^^^^^^^^
+[INFO] - Targets 10
+[INFO] - WD sending signal to 30283
+[INFO] - WD sending signal to 30215
+[INFO] - WD sending signal to 30216
+[INFO] - WD sending signal to 30219
+[INFO] - WD sending signal to 30220
+[WARN] - WD killed all processes because of process with pid 30220
+[INFO] - vvvvvvvvDRONE-TARGvvvvvvv
+[INFO] - 13.000,322.000
+[INFO] - 59.000,428.000
+[INFO] - Obstacles process generated a new set of obstacles
+[INFO] - 139.000,289.000
+[INFO] - 36.000,150.000
+[INFO] - 172.000,326.000
+[INFO] - 466.000,266.000
+[INFO] - 56.000,60.000
+[INFO] - 476.000,413.000
+[INFO] - 173.000,269.000
+[INFO] - 369.000,479.000
+[INFO] - ^^^^^^^^DRONE-TARG^^^^^^^
+[INFO] - vvvvvvvvDRONE-OBSTvvvvvvv
+[INFO] - 452.000,106.000
+[INFO] - 244.000,113.000
+[INFO] - 101.000,77.000
+[INFO] - 391.000,281.000
+[INFO] - 184.000,365.000
+[INFO] - 242.000,490.000
+[INFO] - 149.000,2.000
+[INFO] - 235.000,51.000
+[INFO] - 244.000,115.000
+[INFO] - 337.000,182.000
+[INFO] - ^^^^^^^^DRONE-OBST^^^^^^^
+[INFO] - WD sending signal to 30622
+[INFO] - vvvvvvvvvvvTARGETSvvvvvvvvvvvvvvv
+[INFO] - 13.000,322.000
+[INFO] - 59.000,428.000
+[INFO] - 139.000,289.000
+[INFO] - 36.000,150.000
+[INFO] - 172.000,326.000
+[INFO] - 466.000,266.000
+[INFO] - 56.000,60.000
+[INFO] - 476.000,413.000
+[INFO] - 173.000,269.000
+[INFO] - 369.000,479.000
+[INFO] - ^^^^^^^^^^^TARGETS^^^^^^^^^^^^^^^
+[INFO] - Targets 10
+[INFO] - vvvvvvvvvvvOBSTACLESvvvvvvvvvvvvvvv
+[INFO] - 452.000,106.000
+[INFO] - 244.000,113.000
+[INFO] - 101.000,77.000
+[INFO] - 391.000,281.000
+[INFO] - 184.000,365.000
+[INFO] - 242.000,490.000
+[INFO] - 149.000,2.000
+[INFO] - 235.000,51.000
+[INFO] - 244.000,115.000
+[INFO] - 337.000,182.000
+[INFO] - ^^^^^^^^^^^OBSTACLES^^^^^^^^^^^^^^^
+[INFO] - Obtacles 10
+[INFO] - WD sending signal to 30624
+[INFO] - WD sending signal to 30556
+[INFO] - WD sending signal to 30557
+[INFO] - WD sending signal to 30560
+[INFO] - WD sending signal to 30561
+[INFO] - WD sending signal to 30622
+[INFO] - WD sending signal to 30624
+[INFO] - WD sending signal to 30556
+[INFO] - WD sending signal to 30557
+[INFO] - WD sending signal to 30560
+[INFO] - WD sending signal to 30561
+[INFO] - Input has updated its parameters
+[INFO] - WD sending signal to 30622
+[INFO] - Drone has updated its parameters
+[INFO] - WD sending signal to 30624
+[INFO] - WD sending signal to 30556
+[INFO] - WD sending signal to 30557
+[INFO] - WD sending signal to 30560
+[INFO] - WD sending signal to 30561

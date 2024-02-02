@@ -54,18 +54,8 @@ int main(int argc, char *argv[]) {
     // Specifying that argc and argv are unused variables
     int to_server_pipe, from_server_pipe;
 
-    if (argc == 3) {
-        sscanf(argv[1], "%d", &to_server_pipe);
-        sscanf(argv[2], "%d", &from_server_pipe);
-    } else {
-        printf("Wrong number of arguments in obstacles\n");
-        getchar();
-        exit(1);
-    }
-
     //socket initialization
     int client_fd;
-
     if (socket_use) {
         struct sockaddr_in server_addr;
 
@@ -83,6 +73,18 @@ int main(int argc, char *argv[]) {
         Connect(client_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
     }
 
+    else {
+        //pipes initialization
+        if (argc == 3) {
+            sscanf(argv[1], "%d", &to_server_pipe);
+            sscanf(argv[2], "%d", &from_server_pipe);
+        } else {
+            printf("Wrong number of arguments in obstacles\n");
+            getchar();
+            exit(1);
+        }
+    }
+
     // coordinates of obstacles
     float obstacle_x, obstacle_y;
     // string for the communication with server
@@ -95,9 +97,11 @@ int main(int argc, char *argv[]) {
     srandom((unsigned int)time(NULL) * 33);
 
     fd_set reader, master;
-    FD_ZERO(&reader);
-    FD_ZERO(&master);
-    FD_SET(from_server_pipe, &master);
+    if (!socket_use) {
+        FD_ZERO(&reader);
+        FD_ZERO(&master);
+        FD_SET(from_server_pipe, &master);
+    }
 
     struct timeval select_timeout;
     select_timeout.tv_sec  = OBSTACLES_SPAWN_PERIOD;
@@ -132,28 +136,38 @@ int main(int argc, char *argv[]) {
         // Logging the correct generation
         logging(LOG_INFO, "Obstacles process generated a new set of obstacles");
 
-        // Resetting the fd_sets
-        reader = master;
-        int ret;
-        do {
-            ret = Select(from_server_pipe + 1, &reader, NULL, NULL,
-                         &select_timeout);
-        } while (ret == -1);
-        // Resetting the timeout
-        select_timeout.tv_sec  = OBSTACLES_SPAWN_PERIOD;
-        select_timeout.tv_usec = 0;
-        if (FD_ISSET(from_server_pipe, &reader)) {
-            int read_ret = Read(from_server_pipe, received, MAX_MSG_LEN);
-            if (read_ret == 0) {
-                // If closed pipe close fd
-                Close(from_server_pipe);
-                FD_CLR(from_server_pipe, &master);
-                logging(LOG_WARN, "Pipe to obstacles closed");
+        if (!socket_use) {
+            // Resetting the fd_sets
+            reader = master;
+            int ret;
+            do {
+                ret = Select(from_server_pipe + 1, &reader, NULL, NULL,
+                            &select_timeout);
+            } while (ret == -1);
+            // Resetting the timeout
+            select_timeout.tv_sec  = OBSTACLES_SPAWN_PERIOD;
+            select_timeout.tv_usec = 0;
+            if (FD_ISSET(from_server_pipe, &reader)) {
+                int read_ret = Read(from_server_pipe, received, MAX_MSG_LEN);
+                if (read_ret == 0) {
+                    // If closed pipe close fd
+                    Close(from_server_pipe);
+                    FD_CLR(from_server_pipe, &master);
+                    logging(LOG_WARN, "Pipe to obstacles closed");
+                }
+                // If STOP received then stop everything
+                if (!strcmp(received, "STOP")) {
+                    break;
+                }
             }
-            // If STOP received then stop everything
-            if (!strcmp(received, "STOP")) {
-                break;
-            }
+        }
+
+        else {
+            // Resetting the timeout
+            select_timeout.tv_sec  = OBSTACLES_SPAWN_PERIOD;
+            select_timeout.tv_usec = 0;
+
+            //TO ADD: if STOP for server is received, break
         }
     }
 
