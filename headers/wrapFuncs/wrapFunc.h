@@ -7,6 +7,10 @@
 #include <sys/mman.h>
 #include <sys/select.h>
 #include <sys/signal.h>
+#include <strings.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
 int Wait(int *wstatus);
 int Waitpid(pid_t pid, int *wstatus, int options);
@@ -41,4 +45,8 @@ void Sigprocmask(int type, const sigset_t *mask, sigset_t *oldset);
 void Fclose(FILE *stream);
 void Shm_unlink(const char *name);
 void Munmap(void *addr, size_t len);
+int Socket(int domain, int type, int protocol);
+void Inet_pton(int domain, const char *restrict address, void *restrict sin_address);
+void Connect(int sockfd, const struct sockaddr *server_addr, socklen_t server_addr_len);
+void Send(int sockfd, const void *buffer, size_t len, int flags);
 #endif // !WRAPFUNC

@@ -43,4 +43,9 @@
 // processes
 #define WD_SLEEP_PERIOD 1
 
+// Port for sockets
+#define PORT 8080
+//Address for sockets
+#define SOCKET_ADDRESS "127.0.0.1"
+
 #endif // !CONSTANTS_H

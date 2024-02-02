@@ -14,6 +14,10 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <strings.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
 int Wait(int *wstatus) {
     int ret = wait(wstatus);
@@ -121,7 +125,7 @@ int Read(int fd, void *buf, size_t nbytes) {
 
 int Write(int fd, void *buf, size_t nbytes) {
     // The following lines ignore the SIGPIPE signal in
-    // onder to net cause the process who receives it to crash
+    // order to not cause the process who receives it to crash
     // but allows the handling of the signal in this function
     struct sigaction ignore_pipesig;
     ignore_pipesig.sa_handler = SIG_IGN;
@@ -548,6 +552,72 @@ void Munmap(void *addr, size_t len) {
         char msg[MAX_STR_LEN];
         sprintf(msg,
                 "Error on executing munmap: %s, pid: %d, from: %s, line: %d, awaiting "
+                "termination from WD",
+                strerror(errno), getpid(), __FILE__, __LINE__);
+        printf("%s\n", msg);
+        fflush(stdout);
+        logging(LOG_ERROR, msg);
+        exit(EXIT_FAILURE);
+    }
+}
+
+int Socket(int domain, int type, int protocol) {
+    int ret = socket(domain, type, protocol);
+    
+    if (ret < 0) {
+    	char msg[MAX_STR_LEN];
+        sprintf(msg,
+                "Error on executing socket: %s, pid: %d, from: %s, line: %d, awaiting "
+                "termination from WD",
+                strerror(errno), getpid(), __FILE__, __LINE__);
+        printf("%s\n", msg);
+        fflush(stdout);
+        logging(LOG_ERROR, msg);
+        exit(EXIT_FAILURE);
+    }
+    
+    return ret;
+}
+
+void Inet_pton(int domain, const char *restrict address, void *restrict sin_address) {
+    int ret = inet_pton(domain, address, sin_address);
+    
+    if (ret < 0) {
+    	char msg[MAX_STR_LEN];
+        sprintf(msg,
+                "Error on executing inet_pton: %s, pid: %d, from: %s, line: %d, awaiting "
+                "termination from WD",
+                strerror(errno), getpid(), __FILE__, __LINE__);
+        printf("%s\n", msg);
+        fflush(stdout);
+        logging(LOG_ERROR, msg);
+        exit(EXIT_FAILURE);
+    }
+}
+
+void Connect(int sockfd, const struct sockaddr *server_addr, socklen_t server_addr_len) {
+    int ret = connect(sockfd, server_addr, server_addr_len);
+    
+    if (ret < 0) {
+    	char msg[MAX_STR_LEN];
+        sprintf(msg,
+                "Error on executing connect: %s, pid: %d, from: %s, line: %d, awaiting "
+                "termination from WD",
+                strerror(errno), getpid(), __FILE__, __LINE__);
+        printf("%s\n", msg);
+        fflush(stdout);
+        logging(LOG_ERROR, msg);
+        exit(EXIT_FAILURE);
+    }
+}
+
+void Send(int sockfd, const void *buffer, size_t len, int flags) {
+    int ret = send(sockfd, buffer, len, flags);
+    
+    if (ret < 0) {
+    	char msg[MAX_STR_LEN];
+        sprintf(msg,
+                "Error on executing send: %s, pid: %d, from: %s, line: %d, awaiting "
                 "termination from WD",
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);

@@ -13,9 +13,15 @@
 #include <time.h>
 #include <unistd.h>
 #include <utils/utils.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
 
 // WD pid
 pid_t WD_pid;
+
+// Boolean to decide whether to use pipes or sockets
+bool socket_use = false;
 
 // Once the SIGUSR1 is received send back the SIGUSR2 signal
 void signal_handler(int signo, siginfo_t *info, void *context) {
@@ -57,6 +63,26 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    //socket initialization
+    int client_fd;
+
+    if (socket_use) {
+        struct sockaddr_in server_addr;
+
+        //create the socket
+        client_fd = Socket(AF_INET, SOCK_STREAM, 0);
+
+        //defining the server address for the socket
+        server_addr.sin_family = AF_INET;
+        server_addr.sin_port = htons(PORT);
+
+        //convert addresses from text to binary
+        Inet_pton(AF_INET, SOCKET_ADDRESS, &server_addr.sin_addr);
+
+        //connect the socket to the specified address
+        Connect(client_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
+    }
+
     // coordinates of obstacles
     float obstacle_x, obstacle_y;
     // string for the communication with server
@@ -92,8 +118,13 @@ int main(int argc, char *argv[]) {
             sprintf(aux_to_send, "%.3f,%.3f", obstacle_x, obstacle_y);
             strcat(to_send, aux_to_send);
         }
-        // Sending to the server
-        Write(to_server_pipe, to_send, MAX_MSG_LEN);
+
+        if (socket_use)
+            //send the obstacles coordinates to the other program
+            Send(client_fd, to_send, MAX_MSG_LEN, 0);
+        else
+            // Sending to the server
+            Write(to_server_pipe, to_send, MAX_MSG_LEN);
 
         // Resetting to_send string
         sprintf(to_send, "O");
