@@ -1,1 +1,0 @@
-/usr/bin/cc CMakeFiles/drone.dir/drone.c.o -o ../../bin/drone  ../headers/libwrapFunc.a ../headers/libutils.a -lm 

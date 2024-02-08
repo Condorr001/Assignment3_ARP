@@ -1,2 +1,0 @@
-/usr/bin/ar qc libwrapFunc.a CMakeFiles/wrapFunc.dir/wrapFuncs/wrapFunc.c.o
-/usr/bin/ranlib libwrapFunc.a

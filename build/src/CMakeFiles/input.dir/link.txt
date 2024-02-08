@@ -1,1 +1,0 @@
-/usr/bin/cc CMakeFiles/input.dir/input.c.o -o ../../bin/input  ../headers/libwrapFunc.a ../headers/libutils.a -lm -lcurses /usr/lib/x86_64-linux-gnu/libform.so 
