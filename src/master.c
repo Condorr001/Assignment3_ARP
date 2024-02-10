@@ -81,6 +81,8 @@ int main(int argc, char *argv[]) {
             // Spawn the input and map process using konsole
             char *arg_list[] = {programs[i], NULL, NULL, NULL, NULL, NULL,
                                 NULL,        NULL, NULL, NULL, NULL, NULL};
+            // char *arg_list_debug[] = {"gdb","--args",programs[i], NULL, NULL, NULL, NULL, NULL,
+            //                     NULL,        NULL, NULL, NULL, NULL, NULL,NULL,NULL,NULL};
             char *konsole_arg_list[] = {"konsole", "-e", programs[i], NULL,
                                         NULL,      NULL, NULL};
 

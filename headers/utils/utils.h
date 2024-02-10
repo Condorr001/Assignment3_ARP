@@ -6,3 +6,5 @@ void logging(char *type, char *message);
 int max(int, int);
 void tokenization(struct pos *arr_to_fill, char *to_tokenize, int *objects_num);
 void remove_target(int index, struct pos *objects_arr, int objects_num);
+void Write_echo(int fd, void *buf, long unsigned int num);
+int Read_echo(int fd, void *buf, long unsigned int num);

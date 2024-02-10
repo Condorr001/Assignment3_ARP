@@ -121,6 +121,9 @@ int main(int argc, char *argv[]) {
     printf("Map pid is %d \n", p_pids[1]);
 
     while (1) {
+        // TODO CHANGE. WD must not be executed in assignment 3
+        exit(0);
+
         // Iterate for the number of processes to check
         for (int i = 0; i < NUM_PROCESSES - 1; i++) {
             // Saving the return value of the kill so that it is possible to

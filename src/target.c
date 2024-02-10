@@ -1,5 +1,6 @@
 #include "constants.h"
 #include "wrapFuncs/wrapFunc.h"
+#include <arpa/inet.h>
 #include <curses.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -8,20 +9,18 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/select.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 #include <utils/utils.h>
-#include <string.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
 
 // WD pid
 pid_t WD_pid;
 
 // Boolean to decide whether to use pipes or sockets
-bool socket_use = false;
+bool socket_use = true;
 
 // Once the SIGUSR1 is received send back the SIGUSR2 signal
 void signal_handler(int signo, siginfo_t *info, void *context) {
@@ -52,27 +51,34 @@ int main(int argc, char *argv[]) {
     // Specifying that argc and argv are unused variables
     int to_server_pipe, from_server_pipe;
 
-    //socket initialization
-    int client_fd;
+    // socket initialization
+    int server_fd;
     if (socket_use) {
+        sleep(1);
         struct sockaddr_in server_addr;
 
-        //create the socket
-        client_fd = Socket(AF_INET, SOCK_STREAM, 0);
+        // create the socket
+        server_fd = Socket(AF_INET, SOCK_STREAM, 0);
 
-        //defining the server address for the socket
+        // defining the server address for the socket
         server_addr.sin_family = AF_INET;
-        server_addr.sin_port = htons(PORT);
+        server_addr.sin_port   = htons(PORT);
 
-        //convert addresses from text to binary
-        Inet_pton(AF_INET, SOCKET_ADDRESS, &server_addr.sin_addr);
+        // convert addresses from text to binary
+        Inet_pton(AF_INET, SERVER_ADDRESS, &server_addr.sin_addr);
 
-        //connect the socket to the specified address
-        Connect(client_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
+        // connect the socket to the specified address
+        Connect(server_fd, (struct sockaddr *)&server_addr,
+                sizeof(server_addr));
+
+        Write_echo(server_fd, "TI", MAX_MSG_LEN);
+
+        char dimensions[MAX_MSG_LEN];
+        Read_echo(server_fd, dimensions, MAX_MSG_LEN);
     }
 
     else {
-        //pipes initialization
+        // pipes initialization
         if (argc == 3) {
             sscanf(argv[1], "%d", &to_server_pipe);
             sscanf(argv[2], "%d", &from_server_pipe);
@@ -116,7 +122,7 @@ int main(int argc, char *argv[]) {
 
         if (socket_use)
             // send the obstacles coordinates to the other program
-            Send(client_fd, to_send, MAX_MSG_LEN, 0);
+            Write_echo(server_fd, to_send, MAX_MSG_LEN);
         else
             // sending new targets to the server
             Write(to_server_pipe, to_send, MAX_MSG_LEN);
@@ -127,15 +133,21 @@ int main(int argc, char *argv[]) {
             Read(from_server_pipe, received, MAX_MSG_LEN);
             if (!strcmp(received, "GE")) {
                 logging(LOG_INFO, "Received GE");
-            } 
-            else if (!strcmp(received, "STOP")) {
+            } else if (!strcmp(received, "STOP")) {
                 // Otherwise if it's STOP close everything
                 break;
             }
         }
 
         else {
-            //TO DO: read from socket and see if GE or STOP are received
+            // TO DO: read from socket and see if GE or STOP are received
+            Read_echo(server_fd, received, MAX_MSG_LEN);
+            if (!strcmp(received, "GE")) {
+                logging(LOG_INFO, "Received GE");
+            } else if (!strcmp(received, "STOP")) {
+                // Otherwise if it's STOP close everything
+                break;
+            }
         }
         // Log if new targets have been produced
         logging(LOG_INFO, "Target process generated a new set of targets");

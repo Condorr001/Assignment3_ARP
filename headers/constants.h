@@ -44,8 +44,8 @@
 #define WD_SLEEP_PERIOD 1
 
 // Port for sockets
-#define PORT 8080
+#define PORT 5555
 //Address for sockets
-#define SOCKET_ADDRESS "127.0.0.1"
+#define SERVER_ADDRESS "127.0.0.1"
 
 #endif // !CONSTANTS_H

@@ -1,5 +1,6 @@
 #include "constants.h"
 #include "wrapFuncs/wrapFunc.h"
+#include <arpa/inet.h>
 #include <curses.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -8,20 +9,18 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/select.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 #include <utils/utils.h>
-#include <string.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
 
 // WD pid
 pid_t WD_pid;
 
 // Boolean to decide whether to use pipes or sockets
-bool socket_use = false;
+bool socket_use = true;
 
 // Once the SIGUSR1 is received send back the SIGUSR2 signal
 void signal_handler(int signo, siginfo_t *info, void *context) {
@@ -54,27 +53,34 @@ int main(int argc, char *argv[]) {
     // Specifying that argc and argv are unused variables
     int to_server_pipe, from_server_pipe;
 
-    //socket initialization
-    int client_fd;
+    // socket initialization
+    int server_fd;
     if (socket_use) {
+        sleep(1);
         struct sockaddr_in server_addr;
 
-        //create the socket
-        client_fd = Socket(AF_INET, SOCK_STREAM, 0);
+        // create the socket
+        server_fd = Socket(AF_INET, SOCK_STREAM, 0);
 
-        //defining the server address for the socket
+        // defining the server address for the socket
         server_addr.sin_family = AF_INET;
-        server_addr.sin_port = htons(PORT);
+        server_addr.sin_port   = htons(PORT);
 
-        //convert addresses from text to binary
-        Inet_pton(AF_INET, SOCKET_ADDRESS, &server_addr.sin_addr);
+        // convert addresses from text to binary
+        Inet_pton(AF_INET, SERVER_ADDRESS, &server_addr.sin_addr);
 
-        //connect the socket to the specified address
-        Connect(client_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
+        // connect the socket to the specified address
+        Connect(server_fd, (struct sockaddr *)&server_addr,
+                sizeof(server_addr));
+
+        Write_echo(server_fd, "OI", MAX_MSG_LEN);
+
+        char dimensions[MAX_MSG_LEN];
+        Read_echo(server_fd, dimensions, MAX_MSG_LEN);
     }
 
     else {
-        //pipes initialization
+        // pipes initialization
         if (argc == 3) {
             sscanf(argv[1], "%d", &to_server_pipe);
             sscanf(argv[2], "%d", &from_server_pipe);
@@ -97,10 +103,11 @@ int main(int argc, char *argv[]) {
     srandom((unsigned int)time(NULL) * 33);
 
     fd_set reader, master;
-    if (!socket_use) {
-        FD_ZERO(&reader);
-        FD_ZERO(&master);
-        FD_SET(from_server_pipe, &master);
+    FD_ZERO(&reader);
+    FD_ZERO(&master);
+    FD_SET(from_server_pipe, &master);
+    if (socket_use) {
+        FD_SET(server_fd, &master);
     }
 
     struct timeval select_timeout;
@@ -124,8 +131,8 @@ int main(int argc, char *argv[]) {
         }
 
         if (socket_use)
-            //send the obstacles coordinates to the other program
-            Send(client_fd, to_send, MAX_MSG_LEN, 0);
+            // send the obstacles coordinates to the other program
+            Write_echo(server_fd, to_send, MAX_MSG_LEN);
         else
             // Sending to the server
             Write(to_server_pipe, to_send, MAX_MSG_LEN);
@@ -136,38 +143,37 @@ int main(int argc, char *argv[]) {
         // Logging the correct generation
         logging(LOG_INFO, "Obstacles process generated a new set of obstacles");
 
-        if (!socket_use) {
-            // Resetting the fd_sets
-            reader = master;
-            int ret;
-            do {
-                ret = Select(from_server_pipe + 1, &reader, NULL, NULL,
-                            &select_timeout);
-            } while (ret == -1);
-            // Resetting the timeout
-            select_timeout.tv_sec  = OBSTACLES_SPAWN_PERIOD;
-            select_timeout.tv_usec = 0;
-            if (FD_ISSET(from_server_pipe, &reader)) {
-                int read_ret = Read(from_server_pipe, received, MAX_MSG_LEN);
-                if (read_ret == 0) {
-                    // If closed pipe close fd
+        // Resetting the fd_sets
+        reader = master;
+        int ret;
+        do {
+            ret = Select(from_server_pipe + 1, &reader, NULL, NULL,
+                         &select_timeout);
+        } while (ret == -1);
+        // Resetting the timeout
+        select_timeout.tv_sec  = OBSTACLES_SPAWN_PERIOD;
+        select_timeout.tv_usec = 0;
+        if (FD_ISSET(from_server_pipe, &reader)) {
+            int read_ret;
+            if (socket_use)
+                read_ret = Read_echo(server_fd, received, MAX_MSG_LEN);
+            else
+                read_ret = Read(from_server_pipe, received, MAX_MSG_LEN);
+            if (read_ret == 0) {
+                // If closed pipe close fd
+                if (socket_use) {
+                    Close(server_fd);
+                    FD_CLR(server_fd, &master);
+                } else {
                     Close(from_server_pipe);
                     FD_CLR(from_server_pipe, &master);
-                    logging(LOG_WARN, "Pipe to obstacles closed");
                 }
-                // If STOP received then stop everything
-                if (!strcmp(received, "STOP")) {
-                    break;
-                }
+                logging(LOG_WARN, "Pipe to obstacles closed");
             }
-        }
-
-        else {
-            // Resetting the timeout
-            select_timeout.tv_sec  = OBSTACLES_SPAWN_PERIOD;
-            select_timeout.tv_usec = 0;
-
-            //TO DO: if STOP for server is received, break
+            // If STOP received then stop everything
+            if (!strcmp(received, "STOP")) {
+                break;
+            }
         }
     }
 
