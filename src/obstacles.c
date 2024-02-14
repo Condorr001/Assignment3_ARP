@@ -19,9 +19,6 @@
 // WD pid
 pid_t WD_pid;
 
-// Boolean to decide whether to use pipes or sockets
-bool socket_use = true;
-
 // Variables set to generate target and obstacles for a set dimension of the
 // simulation window
 float socket_simulation_height = 0;
@@ -41,6 +38,10 @@ void signal_handler(int signo, siginfo_t *info, void *context) {
 char received[MAX_MSG_LEN];
 
 int main(int argc, char *argv[]) {
+    // Specifying that argc and argv are not used
+    (void)argc;
+    (void)argv;
+
     // Signal declaration
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
@@ -55,51 +56,36 @@ int main(int argc, char *argv[]) {
     sa.sa_flags = SA_SIGINFO | SA_RESTART;
     Sigaction(SIGUSR1, &sa, NULL);
 
-    // Specifying that argc and argv are unused variables
-    int to_server_pipe, from_server_pipe;
-
     // Server port to which to connect
-    int PORT = 5555;//get_param("target", "server_port");
+    int PORT = get_param("target", "server_port");
 
     // socket initialization
     int server_fd;
-    if (socket_use) {
-        sleep(1);
-        struct sockaddr_in server_addr;
 
-        // create the socket
-        server_fd = Socket(AF_INET, SOCK_STREAM, 0);
+    // Wait for the server to be up
+    sleep(1);
+    struct sockaddr_in server_addr;
 
-        // defining the server address for the socket
-        server_addr.sin_family = AF_INET;
-        server_addr.sin_port   = htons(PORT);
+    // create the socket
+    server_fd = Socket(AF_INET, SOCK_STREAM, 0);
 
-        // convert addresses from text to binary
-        Inet_pton(AF_INET, SERVER_ADDRESS, &server_addr.sin_addr);
+    // defining the server address for the socket
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port   = htons(PORT);
 
-        // connect the socket to the specified address
-        Connect(server_fd, (struct sockaddr *)&server_addr,
-                sizeof(server_addr));
+    // convert addresses from text to binary
+    Inet_pton(AF_INET, SERVER_ADDRESS, &server_addr.sin_addr);
 
-        Write_echo(server_fd, "OI", MAX_MSG_LEN);
+    // connect the socket to the specified address
+    Connect(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
 
-        char dimensions[MAX_MSG_LEN];
-        Read_echo(server_fd, dimensions, MAX_MSG_LEN);
+    Write_echo(server_fd, "OI", MAX_MSG_LEN);
 
-        sscanf(dimensions, "%fx%f", &socket_simulation_height,
-               &socket_simulation_width);
-    }
-    else {
-        // pipes initialization
-        if (argc == 3) {
-            sscanf(argv[1], "%d", &to_server_pipe);
-            sscanf(argv[2], "%d", &from_server_pipe);
-        } else {
-            printf("Wrong number of arguments in obstacles\n");
-            getchar();
-            exit(1);
-        }
-    }
+    char dimensions[MAX_MSG_LEN];
+    Read_echo(server_fd, dimensions, MAX_MSG_LEN);
+
+    sscanf(dimensions, "%fx%f", &socket_simulation_height,
+           &socket_simulation_width);
 
     // coordinates of obstacles
     float obstacle_x, obstacle_y;
@@ -115,11 +101,7 @@ int main(int argc, char *argv[]) {
     fd_set reader, master;
     FD_ZERO(&reader);
     FD_ZERO(&master);
-    if (socket_use) {
-        FD_SET(server_fd, &master);
-    }else{
-        FD_SET(from_server_pipe, &master);
-    }
+    FD_SET(server_fd, &master);
 
     struct timeval select_timeout;
     select_timeout.tv_sec  = OBSTACLES_SPAWN_PERIOD;
@@ -135,18 +117,16 @@ int main(int argc, char *argv[]) {
                 strcat(to_send, "|");
             }
             // The obstacle has to stay inside the simulation window
-            obstacle_x = (float)random() / (float)((float)RAND_MAX/socket_simulation_height);
-            obstacle_y = (float)random() / (float)((float)RAND_MAX/socket_simulation_width);
+            obstacle_x = (float)random() /
+                         (float)((float)RAND_MAX / socket_simulation_height);
+            obstacle_y = (float)random() /
+                         (float)((float)RAND_MAX / socket_simulation_width);
             sprintf(aux_to_send, "%.3f,%.3f", obstacle_x, obstacle_y);
             strcat(to_send, aux_to_send);
         }
 
-        if (socket_use)
-            // send the obstacles coordinates to the other program
-            Write_echo(server_fd, to_send, MAX_MSG_LEN);
-        else
-            // Sending to the server
-            Write(to_server_pipe, to_send, MAX_MSG_LEN);
+        // send the obstacles coordinates to the other program
+        Write_echo(server_fd, to_send, MAX_MSG_LEN);
 
         // Resetting to_send string
         sprintf(to_send, "O");
@@ -158,27 +138,18 @@ int main(int argc, char *argv[]) {
         reader = master;
         int ret;
         do {
-            ret = Select(server_fd + 1, &reader, NULL, NULL,
-                         &select_timeout);
+            ret = Select(server_fd + 1, &reader, NULL, NULL, &select_timeout);
         } while (ret == -1);
         // Resetting the timeout
         select_timeout.tv_sec  = OBSTACLES_SPAWN_PERIOD;
         select_timeout.tv_usec = 0;
         if (FD_ISSET(server_fd, &reader)) {
             int read_ret;
-            if (socket_use)
-                read_ret = Read_echo(server_fd, received, MAX_MSG_LEN);
-            else
-                read_ret = Read(from_server_pipe, received, MAX_MSG_LEN);
+            read_ret = Read_echo(server_fd, received, MAX_MSG_LEN);
             if (read_ret == 0) {
                 // If closed pipe close fd
-                if (socket_use) {
-                    Close(server_fd);
-                    FD_CLR(server_fd, &master);
-                } else {
-                    Close(from_server_pipe);
-                    FD_CLR(from_server_pipe, &master);
-                }
+                Close(server_fd);
+                FD_CLR(server_fd, &master);
                 logging(LOG_WARN, "Pipe to obstacles closed");
             }
             // If STOP received then stop everything
@@ -188,7 +159,5 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // Cleaning up
-    Close(to_server_pipe);
     return 0;
 }

@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
-#include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -18,9 +17,6 @@
 
 // WD pid
 pid_t WD_pid;
-
-// Boolean to decide whether to use pipes or sockets
-bool socket_use = true;
 
 // Variables set to generate target and obstacles for a set dimension of the
 // simulation window
@@ -39,6 +35,10 @@ void signal_handler(int signo, siginfo_t *info, void *context) {
 }
 
 int main(int argc, char *argv[]) {
+    // Specify that argc and argv are not used
+    (void)argc;
+    (void)argv;
+
     // Signal declaration
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
@@ -53,54 +53,36 @@ int main(int argc, char *argv[]) {
     sa.sa_flags = SA_SIGINFO | SA_RESTART;
     Sigaction(SIGUSR1, &sa, NULL);
 
-    // Specifying that argc and argv are unused variables
-    int to_server_pipe, from_server_pipe;
-
     // Server port to whitch to connect
-    int PORT = 5555;//get_param("target", "server_port");
+    int PORT = get_param("target", "server_port");
 
     // socket initialization
     int server_fd;
-    if (socket_use) {
-        sleep(1);
-        struct sockaddr_in server_addr;
+    sleep(1);
+    struct sockaddr_in server_addr;
 
-        // create the socket
-        server_fd = Socket(AF_INET, SOCK_STREAM, 0);
+    // create the socket
+    server_fd = Socket(AF_INET, SOCK_STREAM, 0);
 
-        // defining the server address for the socket
-        server_addr.sin_family = AF_INET;
-        server_addr.sin_port   = htons(PORT);
+    // defining the server address for the socket
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port   = htons(PORT);
 
-        // convert addresses from text to binary
-        Inet_pton(AF_INET, SERVER_ADDRESS, &server_addr.sin_addr);
+    // convert addresses from text to binary
+    Inet_pton(AF_INET, SERVER_ADDRESS, &server_addr.sin_addr);
 
-        // connect the socket to the specified address
-        Connect(server_fd, (struct sockaddr *)&server_addr,
-                sizeof(server_addr));
+    // connect the socket to the specified address
+    Connect(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
 
-        Write_echo(server_fd, "TI", MAX_MSG_LEN);
+    Write_echo(server_fd, "TI", MAX_MSG_LEN);
 
-        char dimensions[MAX_MSG_LEN];
-        Read_echo(server_fd, dimensions, MAX_MSG_LEN);
+    char dimensions[MAX_MSG_LEN];
+    Read_echo(server_fd, dimensions, MAX_MSG_LEN);
 
-        // Reading the dimensions of the window from the string sent by the
-        // server
-        sscanf(dimensions, "%fx%f", &socket_simulation_width,
-               &socket_simulation_height);
-    }
-
-    else {
-        // pipes initialization
-        if (argc == 3) {
-            sscanf(argv[1], "%d", &to_server_pipe);
-            sscanf(argv[2], "%d", &from_server_pipe);
-        } else {
-            printf("Wrong number of arguments in target\n");
-            getchar();
-            exit(1);
-        }
-    }
+    // Reading the dimensions of the window from the string sent by the
+    // server
+    sscanf(dimensions, "%fx%f", &socket_simulation_width,
+           &socket_simulation_height);
 
     // coordinates of target
     float target_x, target_y;
@@ -135,40 +117,20 @@ int main(int argc, char *argv[]) {
             strcat(to_send, aux_to_send);
         }
 
-        if (socket_use)
-            // send the obstacles coordinates to the other program
-            Write_echo(server_fd, to_send, MAX_MSG_LEN);
-        else
-            // sending new targets to the server
-            Write(to_server_pipe, to_send, MAX_MSG_LEN);
+        // send the obstacles coordinates to the other program
+        Write_echo(server_fd, to_send, MAX_MSG_LEN);
 
-        if (!socket_use) {
-            // Here Read is used instead of Select because it has to be blocking
-            // untill the server sends a new GE
-            Read(from_server_pipe, received, MAX_MSG_LEN);
-            if (!strcmp(received, "GE")) {
-                logging(LOG_INFO, "Received GE");
-            } else if (!strcmp(received, "STOP")) {
-                // Otherwise if it's STOP close everything
-                break;
-            }
-        }
-
-        else {
-            // TO DO: read from socket and see if GE or STOP are received
-            Read_echo(server_fd, received, MAX_MSG_LEN);
-            if (!strcmp(received, "GE")) {
-                logging(LOG_INFO, "Received GE");
-            } else if (!strcmp(received, "STOP")) {
-                // Otherwise if it's STOP close everything
-                break;
-            }
+        // TO DO: read from socket and see if GE or STOP are received
+        Read_echo(server_fd, received, MAX_MSG_LEN);
+        if (!strcmp(received, "GE")) {
+            logging(LOG_INFO, "Received GE");
+        } else if (!strcmp(received, "STOP")) {
+            // Otherwise if it's STOP close everything
+            break;
         }
         // Log if new targets have been produced
         logging(LOG_INFO, "Target process generated a new set of targets");
     }
 
-    // Cleaning up
-    Close(to_server_pipe);
     return 0;
 }

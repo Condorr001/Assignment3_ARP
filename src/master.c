@@ -1,12 +1,15 @@
 #include "constants.h"
 #include "wrapFuncs/wrapFunc.h"
 #include <fcntl.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+bool lab_time = false;
 
 // Function to spawn the processes
 static void spawn(char **arg_list) {
@@ -81,11 +84,14 @@ int main(int argc, char *argv[]) {
             // Spawn the input and map process using konsole
             char *arg_list[] = {programs[i], NULL, NULL, NULL, NULL, NULL,
                                 NULL,        NULL, NULL, NULL, NULL, NULL};
-            char *arg_list_debug[] = {"gdb","--args",programs[i], NULL, NULL, NULL, NULL, NULL,
-                                NULL,        NULL, NULL, NULL, NULL, NULL,NULL,NULL,NULL};
+            // char *arg_list_debug[] = {"gdb","--args",programs[i], NULL, NULL,
+            // NULL, NULL, NULL,
+            //                     NULL,        NULL, NULL, NULL, NULL,
+            //                     NULL,NULL,NULL,NULL};
             char *konsole_arg_list[] = {"konsole", "-e", programs[i], NULL,
                                         NULL,      NULL, NULL};
-            // char *konsole_arg_list_debug[] = {"konsole", "-e","gdb","--args", programs[i], NULL,
+            // char *konsole_arg_list_debug[] = {"konsole", "-e","gdb","--args",
+            // programs[i], NULL,
             //                             NULL,      NULL, NULL};
 
             switch (i) {
@@ -218,18 +224,20 @@ int main(int argc, char *argv[]) {
                     Close(server_obstacles[0]);
                     Close(server_obstacles[1]);
 
-                    spawn(arg_list);
+                    if (!lab_time)
+                        spawn(arg_list);
                     break;
                 case 5:
                     // Obstacles
                     sprintf(obstacles_server_str, "%d", obstacles_server[1]);
                     sprintf(server_obstacles_str, "%d", server_obstacles[0]);
-                    arg_list_debug[3] = obstacles_server_str;
-                    arg_list_debug[5] = server_obstacles_str;
+                    arg_list[1] = obstacles_server_str;
+                    arg_list[3] = server_obstacles_str;
                     Close(obstacles_server[0]);
                     Close(server_obstacles[1]);
 
-                    spawn(arg_list_debug);
+                    if (!lab_time)
+                        spawn(arg_list);
                     break;
             }
             // spawn the last program, so the WD, which needs all the processes

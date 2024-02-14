@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     Sigaction(SIGUSR1, &sa, NULL);
 
     // Port on which to expose the services
-    int PORT = 5555;//get_param("server", "server_port");
+    int PORT = get_param("server", "server_port");
 
     // Specifying that argc and argv are unused variables
     uint from_drone_pipe, to_drone_pipe, from_input_pipe, to_input_pipe,
