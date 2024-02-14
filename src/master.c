@@ -81,10 +81,12 @@ int main(int argc, char *argv[]) {
             // Spawn the input and map process using konsole
             char *arg_list[] = {programs[i], NULL, NULL, NULL, NULL, NULL,
                                 NULL,        NULL, NULL, NULL, NULL, NULL};
-            // char *arg_list_debug[] = {"gdb","--args",programs[i], NULL, NULL, NULL, NULL, NULL,
-            //                     NULL,        NULL, NULL, NULL, NULL, NULL,NULL,NULL,NULL};
+            char *arg_list_debug[] = {"gdb","--args",programs[i], NULL, NULL, NULL, NULL, NULL,
+                                NULL,        NULL, NULL, NULL, NULL, NULL,NULL,NULL,NULL};
             char *konsole_arg_list[] = {"konsole", "-e", programs[i], NULL,
                                         NULL,      NULL, NULL};
+            // char *konsole_arg_list_debug[] = {"konsole", "-e","gdb","--args", programs[i], NULL,
+            //                             NULL,      NULL, NULL};
 
             switch (i) {
                 case 0:
@@ -222,12 +224,12 @@ int main(int argc, char *argv[]) {
                     // Obstacles
                     sprintf(obstacles_server_str, "%d", obstacles_server[1]);
                     sprintf(server_obstacles_str, "%d", server_obstacles[0]);
-                    arg_list[1] = obstacles_server_str;
-                    arg_list[2] = server_obstacles_str;
+                    arg_list_debug[3] = obstacles_server_str;
+                    arg_list_debug[5] = server_obstacles_str;
                     Close(obstacles_server[0]);
                     Close(server_obstacles[1]);
 
-                    spawn(arg_list);
+                    spawn(arg_list_debug);
                     break;
             }
             // spawn the last program, so the WD, which needs all the processes

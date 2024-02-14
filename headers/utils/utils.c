@@ -8,7 +8,7 @@
 #include <sys/file.h>
 #include <unistd.h>
 
-#define MAX_PROCESSES 5
+#define MAX_PROCESSES 10
 #define MAX_VALUES_FOR_PROCESS 30
 #define MAX_PROCESS_NAME_LEN 30
 #define MAX_LEN_PROCESS_ATTR 50

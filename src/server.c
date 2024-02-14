@@ -46,6 +46,9 @@ int main(int argc, char *argv[]) {
     // Enabling the handler with the specified flags
     Sigaction(SIGUSR1, &sa, NULL);
 
+    // Port on which to expose the services
+    int PORT = 5555;//get_param("server", "server_port");
+
     // Specifying that argc and argv are unused variables
     uint from_drone_pipe, to_drone_pipe, from_input_pipe, to_input_pipe,
         from_map_pipe, to_map_pipe;
@@ -155,7 +158,7 @@ int main(int argc, char *argv[]) {
 
                         to_identify_index++;
                     } else if (i == to_identify[0]) {
-                        char dim[30];
+                        char dim[MAX_MSG_LEN];
                         sprintf(dim, "%dx%d", SIMULATION_HEIGHT,
                                 SIMULATION_WIDTH);
                         if (!strcmp(received, "TI")) {
@@ -171,7 +174,7 @@ int main(int argc, char *argv[]) {
                         }
                         to_identify[0] = 0;
                     } else if (i == to_identify[1]) {
-                        char dim[30];
+                        char dim[MAX_MSG_LEN];
                         sprintf(dim, "%dx%d", SIMULATION_HEIGHT,
                                 SIMULATION_WIDTH);
                         // TODO maybe check if reassigning

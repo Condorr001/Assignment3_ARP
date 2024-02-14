@@ -22,6 +22,11 @@ pid_t WD_pid;
 // Boolean to decide whether to use pipes or sockets
 bool socket_use = true;
 
+// Variables set to generate target and obstacles for a set dimension of the
+// simulation window
+float socket_simulation_height = 0;
+float socket_simulation_width  = 0;
+
 // Once the SIGUSR1 is received send back the SIGUSR2 signal
 void signal_handler(int signo, siginfo_t *info, void *context) {
     // Specifying thhat context is not used
@@ -53,6 +58,9 @@ int main(int argc, char *argv[]) {
     // Specifying that argc and argv are unused variables
     int to_server_pipe, from_server_pipe;
 
+    // Server port to which to connect
+    int PORT = 5555;//get_param("target", "server_port");
+
     // socket initialization
     int server_fd;
     if (socket_use) {
@@ -77,8 +85,10 @@ int main(int argc, char *argv[]) {
 
         char dimensions[MAX_MSG_LEN];
         Read_echo(server_fd, dimensions, MAX_MSG_LEN);
-    }
 
+        sscanf(dimensions, "%fx%f", &socket_simulation_height,
+               &socket_simulation_width);
+    }
     else {
         // pipes initialization
         if (argc == 3) {
@@ -105,9 +115,10 @@ int main(int argc, char *argv[]) {
     fd_set reader, master;
     FD_ZERO(&reader);
     FD_ZERO(&master);
-    FD_SET(from_server_pipe, &master);
     if (socket_use) {
         FD_SET(server_fd, &master);
+    }else{
+        FD_SET(from_server_pipe, &master);
     }
 
     struct timeval select_timeout;
@@ -124,8 +135,8 @@ int main(int argc, char *argv[]) {
                 strcat(to_send, "|");
             }
             // The obstacle has to stay inside the simulation window
-            obstacle_x = random() % SIMULATION_WIDTH;
-            obstacle_y = random() % SIMULATION_HEIGHT;
+            obstacle_x = (float)random() / (float)((float)RAND_MAX/socket_simulation_height);
+            obstacle_y = (float)random() / (float)((float)RAND_MAX/socket_simulation_width);
             sprintf(aux_to_send, "%.3f,%.3f", obstacle_x, obstacle_y);
             strcat(to_send, aux_to_send);
         }
@@ -143,17 +154,17 @@ int main(int argc, char *argv[]) {
         // Logging the correct generation
         logging(LOG_INFO, "Obstacles process generated a new set of obstacles");
 
-        // Resetting the fd_sets
+        // Resetting the fd_seta
         reader = master;
         int ret;
         do {
-            ret = Select(from_server_pipe + 1, &reader, NULL, NULL,
+            ret = Select(server_fd + 1, &reader, NULL, NULL,
                          &select_timeout);
         } while (ret == -1);
         // Resetting the timeout
         select_timeout.tv_sec  = OBSTACLES_SPAWN_PERIOD;
         select_timeout.tv_usec = 0;
-        if (FD_ISSET(from_server_pipe, &reader)) {
+        if (FD_ISSET(server_fd, &reader)) {
             int read_ret;
             if (socket_use)
                 read_ret = Read_echo(server_fd, received, MAX_MSG_LEN);

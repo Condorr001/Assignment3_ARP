@@ -43,8 +43,6 @@
 // processes
 #define WD_SLEEP_PERIOD 1
 
-// Port for sockets
-#define PORT 5555
 //Address for sockets
 #define SERVER_ADDRESS "127.0.0.1"
 

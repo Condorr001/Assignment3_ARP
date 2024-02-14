@@ -40,3 +40,18 @@ max_force=50
 force_step=10
 # Same as the drone one. Olso here the parameter is in seconds
 reading_params_interval=10
+
+# *NOTE* that changing any of these variables will need a restart
+# of the system
+
+[target]
+# Server port to witch connect the target generator
+server_port=5555
+
+[obstacle]
+# Server port to witch connect the target generator
+server_port=5555
+
+[server]
+# The port that the server exposes
+server_port=5555

@@ -22,6 +22,11 @@ pid_t WD_pid;
 // Boolean to decide whether to use pipes or sockets
 bool socket_use = true;
 
+// Variables set to generate target and obstacles for a set dimension of the
+// simulation window
+float socket_simulation_height = 0;
+float socket_simulation_width  = 0;
+
 // Once the SIGUSR1 is received send back the SIGUSR2 signal
 void signal_handler(int signo, siginfo_t *info, void *context) {
     // Specifying thhat context is not used
@@ -51,6 +56,9 @@ int main(int argc, char *argv[]) {
     // Specifying that argc and argv are unused variables
     int to_server_pipe, from_server_pipe;
 
+    // Server port to whitch to connect
+    int PORT = 5555;//get_param("target", "server_port");
+
     // socket initialization
     int server_fd;
     if (socket_use) {
@@ -75,6 +83,11 @@ int main(int argc, char *argv[]) {
 
         char dimensions[MAX_MSG_LEN];
         Read_echo(server_fd, dimensions, MAX_MSG_LEN);
+
+        // Reading the dimensions of the window from the string sent by the
+        // server
+        sscanf(dimensions, "%fx%f", &socket_simulation_width,
+               &socket_simulation_height);
     }
 
     else {
@@ -114,8 +127,10 @@ int main(int argc, char *argv[]) {
                 strcat(to_send, "|");
             }
             // Targets need to be inside the simulation window
-            target_x = random() % SIMULATION_WIDTH;
-            target_y = random() % SIMULATION_HEIGHT;
+            target_x = (float)random() /
+                       (float)((float)RAND_MAX / socket_simulation_height);
+            target_y = (float)random() /
+                       (float)((float)RAND_MAX / socket_simulation_width);
             sprintf(aux_to_send, "%.3f,%.3f", target_x, target_y);
             strcat(to_send, aux_to_send);
         }
