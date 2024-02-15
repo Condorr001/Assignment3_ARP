@@ -1,5 +1,6 @@
 #include "constants.h"
 #include "wrapFuncs/wrapFunc.h"
+#include <curses.h>
 #include <fcntl.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -9,7 +10,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-bool lab_time = false;
+bool lab_time = true;
 
 // Function to spawn the processes
 static void spawn(char **arg_list) {
@@ -226,6 +227,8 @@ int main(int argc, char *argv[]) {
 
                     if (!lab_time)
                         spawn(arg_list);
+                    else
+                        exit(EXIT_SUCCESS);
                     break;
                 case 5:
                     // Obstacles
@@ -238,6 +241,8 @@ int main(int argc, char *argv[]) {
 
                     if (!lab_time)
                         spawn(arg_list);
+                    else
+                        exit(EXIT_SUCCESS);
                     break;
             }
             // spawn the last program, so the WD, which needs all the processes

@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
     char dimensions[MAX_MSG_LEN];
     Read_echo(server_fd, dimensions, MAX_MSG_LEN);
 
-    sscanf(dimensions, "%fx%f", &socket_simulation_height,
+    sscanf(dimensions, "%f.3,%f.3", &socket_simulation_height,
            &socket_simulation_width);
 
     // coordinates of obstacles

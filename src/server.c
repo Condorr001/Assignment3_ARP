@@ -159,8 +159,8 @@ int main(int argc, char *argv[]) {
                         to_identify_index++;
                     } else if (i == to_identify[0]) {
                         char dim[MAX_MSG_LEN];
-                        sprintf(dim, "%dx%d", SIMULATION_HEIGHT,
-                                SIMULATION_WIDTH);
+                        sprintf(dim, "%f.3,%f.3", (float)SIMULATION_HEIGHT,
+                                (float)SIMULATION_WIDTH);
                         if (!strcmp(received, "TI")) {
                             Write_echo(i, dim, MAX_MSG_LEN);
                             target_sockfd = i;
@@ -175,8 +175,8 @@ int main(int argc, char *argv[]) {
                         to_identify[0] = 0;
                     } else if (i == to_identify[1]) {
                         char dim[MAX_MSG_LEN];
-                        sprintf(dim, "%dx%d", SIMULATION_HEIGHT,
-                                SIMULATION_WIDTH);
+                        sprintf(dim, "%f.3,%f.3", (float)SIMULATION_HEIGHT,
+                                (float)SIMULATION_WIDTH);
                         // TODO maybe check if reassigning
                         if (!strcmp(received, "TI")) {
                             Write_echo(i, dim, MAX_MSG_LEN);
