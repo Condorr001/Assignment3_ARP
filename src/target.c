@@ -15,43 +15,15 @@
 #include <unistd.h>
 #include <utils/utils.h>
 
-// WD pid
-pid_t WD_pid;
-
 // Variables set to generate target and obstacles for a set dimension of the
 // simulation window
 float socket_simulation_height = 0;
 float socket_simulation_width  = 0;
 
-// Once the SIGUSR1 is received send back the SIGUSR2 signal
-void signal_handler(int signo, siginfo_t *info, void *context) {
-    // Specifying thhat context is not used
-    (void)(context);
-
-    if (signo == SIGUSR1) {
-        WD_pid = info->si_pid;
-        Kill(WD_pid, SIGUSR2);
-    }
-}
-
 int main(int argc, char *argv[]) {
     // Specify that argc and argv are not used
     (void)argc;
     (void)argv;
-
-    // Signal declaration
-    struct sigaction sa;
-    memset(&sa, 0, sizeof(sa));
-
-    // Setting the signal handler
-    sa.sa_sigaction = signal_handler;
-    // Resetting the mask
-    sigemptyset(&sa.sa_mask);
-    // Setting flags
-    // The SA_RESTART flag has been added to restart all those syscalls that can
-    // get interrupted by signals
-    sa.sa_flags = SA_SIGINFO | SA_RESTART;
-    Sigaction(SIGUSR1, &sa, NULL);
 
     // Server port to whitch to connect
     int PORT = get_param("target", "server_port");

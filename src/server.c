@@ -31,21 +31,6 @@ void signal_handler(int signo, siginfo_t *info, void *context) {
 }
 
 int main(int argc, char *argv[]) {
-    // Signal declaration
-    struct sigaction sa;
-    memset(&sa, 0, sizeof(sa));
-
-    // Setting the signal handler
-    sa.sa_sigaction = signal_handler;
-    sigemptyset(&sa.sa_mask);
-    // Setting flags
-    // The SA_RESTART flag is used to restart all those syscalls that can get
-    // interrupted by signals
-    sa.sa_flags = SA_SIGINFO | SA_RESTART;
-
-    // Enabling the handler with the specified flags
-    Sigaction(SIGUSR1, &sa, NULL);
-
     // Port on which to expose the services
     int PORT = get_param("server", "server_port");
 

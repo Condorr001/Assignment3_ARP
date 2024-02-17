@@ -10,7 +10,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-bool lab_time = true;
+bool lab_time = false;
 
 // Function to spawn the processes
 static void spawn(char **arg_list) {
@@ -31,13 +31,9 @@ int main(int argc, char *argv[]) {
     strcpy(programs[3], "./map");
     strcpy(programs[4], "./target");
     strcpy(programs[5], "./obstacles");
-    strcpy(programs[6], "./WD");
 
     // Pids for all children
     pid_t child[NUM_PROCESSES];
-
-    // String to contain all che children pids (except WD)
-    char child_pids_str[NUM_PROCESSES - 1][80];
 
     // Arrays to contain the pids
     int input_drone[2];
@@ -171,19 +167,6 @@ int main(int argc, char *argv[]) {
                         exit(EXIT_SUCCESS);
                     break;
             }
-            // spawn the last program, so the WD, which needs all the processes
-            // PIDs
-            if (i == NUM_PROCESSES - 1) {
-                for (int i = 0; i < NUM_PROCESSES - 1; i++)
-                    sprintf(child_pids_str[i], "%d", child[i]);
-
-                // Sending as arguments to the WD all the processes PIDs
-                char *arg_list[] = {programs[i],       child_pids_str[0],
-                                    child_pids_str[1], child_pids_str[2],
-                                    child_pids_str[3], child_pids_str[4],
-                                    child_pids_str[5], NULL};
-                spawn(arg_list);
-            }
         } else {
             // If we are in the father we need to close all the unused pipes
             // since they are duplicated every time
@@ -222,7 +205,6 @@ int main(int argc, char *argv[]) {
     printf("Konsole of Map pid is %d\n", child[3]);
     printf("Target pid is %d\n", child[4]);
     printf("Obstacles pid is %d\n", child[5]);
-    printf("WD pid is %d\n", child[6]);
 
     // Value for waiting for the children to terminate
     int res;
