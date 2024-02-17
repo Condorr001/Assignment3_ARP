@@ -42,7 +42,7 @@ Simply execute the run.sh script in the main folder by typing in the shell:
 
 ## How does it work
 ### Architecture
-![architecture-image-placeholder](docs/Schema_assignment2_ARP.png?raw=true)
+![architecture-image-placeholder](docs/Schema_assignment3_ARP.png?raw=true)
 ### Active components
 The active components of this project are:
 - Server
