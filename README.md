@@ -42,8 +42,7 @@ Simply execute the run.sh script in the main folder by typing in the shell:
 
 ## How does it work
 ### Architecture
-!!!To modify!!!
-![architecture-image-placeholder](docs/Schema_assignment2_ARP.png?raw=true)
+![architecture-image-placeholder](docs/Schema_assignment3_ARP.png?raw=true)
 ### Active components
 The active components of this project are:
 - Server
@@ -209,8 +208,6 @@ The project is structured as follows:
 ├── docs --------------------------------------> Contains a few documents to better understand the project
 │   ├── assignmentsv2.1.pdf
 │   ├── function.png
-│   └── Schema_assignment1_ARP.png
-│   └── Schema_assignment2_ARP.png
 │   └── Schema_assignment3_ARP.png
 ├── headers
 │   ├── CMakeLists.txt
