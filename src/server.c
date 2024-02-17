@@ -53,17 +53,13 @@ int main(int argc, char *argv[]) {
     uint from_drone_pipe, to_drone_pipe, from_input_pipe, to_input_pipe,
         from_map_pipe, to_map_pipe;
 
-    if (argc == 11) {
+    if (argc == 7) {
         sscanf(argv[1], "%u", &from_drone_pipe);
         sscanf(argv[2], "%u", &to_drone_pipe);
         sscanf(argv[3], "%u", &from_input_pipe);
         sscanf(argv[4], "%u", &to_input_pipe);
         sscanf(argv[5], "%u", &from_map_pipe);
         sscanf(argv[6], "%u", &to_map_pipe);
-        // sscanf(argv[7], "%d", &from_target_pipe);
-        // sscanf(argv[8], "%d", &to_target_pipe);
-        // sscanf(argv[9], "%d", &from_obstacles_pipe);
-        // sscanf(argv[10], "%d", &to_obstacle_pipe);
     } else {
         printf("Server: wrong number of arguments in input\n");
         fflush(stdout);
@@ -86,8 +82,6 @@ int main(int argc, char *argv[]) {
     FD_ZERO(&master);
     FD_SET(from_drone_pipe, &master);
     FD_SET(from_input_pipe, &master);
-    FD_SET(from_map_pipe, &master);
-    // FD_SET(from_target_pipe, &master);
     FD_SET(from_map_pipe, &master);
 
     // Setting the maxfd
@@ -177,7 +171,6 @@ int main(int argc, char *argv[]) {
                         char dim[MAX_MSG_LEN];
                         sprintf(dim, "%f.3,%f.3", (float)SIMULATION_HEIGHT,
                                 (float)SIMULATION_WIDTH);
-                        // TODO maybe check if reassigning
                         if (!strcmp(received, "TI")) {
                             Write_echo(i, dim, MAX_MSG_LEN);
                             target_sockfd = i;

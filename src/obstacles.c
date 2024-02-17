@@ -81,9 +81,11 @@ int main(int argc, char *argv[]) {
 
     Write_echo(server_fd, "OI", MAX_MSG_LEN);
 
+    // Get dimensions for which to generate obstacles
     char dimensions[MAX_MSG_LEN];
     Read_echo(server_fd, dimensions, MAX_MSG_LEN);
 
+    // Parsing the string
     sscanf(dimensions, "%f.3,%f.3", &socket_simulation_height,
            &socket_simulation_width);
 

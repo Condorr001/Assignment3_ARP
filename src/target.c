@@ -74,8 +74,10 @@ int main(int argc, char *argv[]) {
     // connect the socket to the specified address
     Connect(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
 
+    // Send message for initialization
     Write_echo(server_fd, "TI", MAX_MSG_LEN);
 
+    // Get dimensions for which to generate dimensions
     char dimensions[MAX_MSG_LEN];
     Read_echo(server_fd, dimensions, MAX_MSG_LEN);
 
@@ -120,7 +122,7 @@ int main(int argc, char *argv[]) {
         // send the obstacles coordinates to the other program
         Write_echo(server_fd, to_send, MAX_MSG_LEN);
 
-        // TO DO: read from socket and see if GE or STOP are received
+        // Read to check if stop or GE has been issued
         Read_echo(server_fd, received, MAX_MSG_LEN);
         if (!strcmp(received, "GE")) {
             logging(LOG_INFO, "Received GE");

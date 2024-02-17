@@ -47,10 +47,6 @@ int main(int argc, char *argv[]) {
     int input_server[2];
     int map_server[2];
     int server_map[2];
-    int target_server[2];
-    int server_target[2];
-    int obstacles_server[2];
-    int server_obstacles[2];
 
     // Creating the pipes
     Pipe(input_drone);
@@ -60,10 +56,6 @@ int main(int argc, char *argv[]) {
     Pipe(input_server);
     Pipe(map_server);
     Pipe(server_map);
-    Pipe(target_server);
-    Pipe(server_target);
-    Pipe(obstacles_server);
-    Pipe(server_obstacles);
 
     // strings to pass pipe values as args
     char input_drone_str[10];
@@ -73,10 +65,6 @@ int main(int argc, char *argv[]) {
     char input_server_str[10];
     char map_server_str[10];
     char server_map_str[10];
-    char target_server_str[10];
-    char server_target_str[10];
-    char obstacles_server_str[10];
-    char server_obstacles_str[10];
 
     for (int i = 0; i < NUM_PROCESSES; i++) {
         child[i] = Fork();
@@ -85,15 +73,8 @@ int main(int argc, char *argv[]) {
             // Spawn the input and map process using konsole
             char *arg_list[] = {programs[i], NULL, NULL, NULL, NULL, NULL,
                                 NULL,        NULL, NULL, NULL, NULL, NULL};
-            // char *arg_list_debug[] = {"gdb","--args",programs[i], NULL, NULL,
-            // NULL, NULL, NULL,
-            //                     NULL,        NULL, NULL, NULL, NULL,
-            //                     NULL,NULL,NULL,NULL};
             char *konsole_arg_list[] = {"konsole", "-e", programs[i], NULL,
                                         NULL,      NULL, NULL};
-            // char *konsole_arg_list_debug[] = {"konsole", "-e","gdb","--args",
-            // programs[i], NULL,
-            //                             NULL,      NULL, NULL};
 
             switch (i) {
                 case 0:
@@ -104,30 +85,18 @@ int main(int argc, char *argv[]) {
                     sprintf(server_input_str, "%d", server_input[1]);
                     sprintf(map_server_str, "%d", map_server[0]);
                     sprintf(server_map_str, "%d", server_map[1]);
-                    sprintf(target_server_str, "%d", target_server[0]);
-                    sprintf(server_target_str, "%d", server_target[1]);
-                    sprintf(obstacles_server_str, "%d", obstacles_server[0]);
-                    sprintf(server_obstacles_str, "%d", server_obstacles[1]);
                     arg_list[1]  = drone_server_str;
                     arg_list[2]  = server_drone_str;
                     arg_list[3]  = input_server_str;
                     arg_list[4]  = server_input_str;
                     arg_list[5]  = map_server_str;
                     arg_list[6]  = server_map_str;
-                    arg_list[7]  = target_server_str;
-                    arg_list[8]  = server_target_str;
-                    arg_list[9]  = obstacles_server_str;
-                    arg_list[10] = server_obstacles_str;
                     Close(drone_server[1]);
                     Close(server_drone[0]);
                     Close(input_server[1]);
                     Close(server_input[0]);
                     Close(map_server[1]);
                     Close(server_map[0]);
-                    Close(target_server[1]);
-                    Close(server_target[0]);
-                    Close(obstacles_server[1]);
-                    Close(server_obstacles[0]);
                     Close(input_drone[0]);
                     Close(input_drone[1]);
                     spawn(arg_list);
@@ -152,14 +121,6 @@ int main(int argc, char *argv[]) {
                     Close(map_server[1]);
                     Close(server_map[0]);
                     Close(server_map[1]);
-                    Close(target_server[0]);
-                    Close(target_server[1]);
-                    Close(server_target[0]);
-                    Close(server_target[1]);
-                    Close(obstacles_server[0]);
-                    Close(obstacles_server[1]);
-                    Close(server_obstacles[0]);
-                    Close(server_obstacles[1]);
                     spawn(arg_list);
                     break;
                 case 2:
@@ -178,14 +139,6 @@ int main(int argc, char *argv[]) {
                     Close(map_server[1]);
                     Close(server_map[0]);
                     Close(server_map[1]);
-                    Close(target_server[0]);
-                    Close(target_server[1]);
-                    Close(server_target[0]);
-                    Close(server_target[1]);
-                    Close(obstacles_server[0]);
-                    Close(obstacles_server[1]);
-                    Close(server_obstacles[0]);
-                    Close(server_obstacles[1]);
 
                     Execvp("konsole", konsole_arg_list);
                     exit(EXIT_FAILURE);
@@ -199,32 +152,12 @@ int main(int argc, char *argv[]) {
                     Close(map_server[0]);
                     Close(server_map[1]);
 
-                    Close(target_server[0]);
-                    Close(target_server[1]);
-                    Close(server_target[0]);
-                    Close(server_target[1]);
-                    Close(obstacles_server[0]);
-                    Close(obstacles_server[1]);
-                    Close(server_obstacles[0]);
-                    Close(server_obstacles[1]);
 
                     Execvp("konsole", konsole_arg_list);
                     exit(EXIT_FAILURE);
                     break;
                 case 4:
                     // Target
-                    sprintf(target_server_str, "%d", target_server[1]);
-                    sprintf(server_target_str, "%d", server_target[0]);
-                    arg_list[1] = target_server_str;
-                    arg_list[2] = server_target_str;
-                    Close(target_server[0]);
-                    Close(server_target[1]);
-
-                    Close(obstacles_server[0]);
-                    Close(obstacles_server[1]);
-                    Close(server_obstacles[0]);
-                    Close(server_obstacles[1]);
-
                     if (!lab_time)
                         spawn(arg_list);
                     else
@@ -232,13 +165,6 @@ int main(int argc, char *argv[]) {
                     break;
                 case 5:
                     // Obstacles
-                    sprintf(obstacles_server_str, "%d", obstacles_server[1]);
-                    sprintf(server_obstacles_str, "%d", server_obstacles[0]);
-                    arg_list[1] = obstacles_server_str;
-                    arg_list[3] = server_obstacles_str;
-                    Close(obstacles_server[0]);
-                    Close(server_obstacles[1]);
-
                     if (!lab_time)
                         spawn(arg_list);
                     else
@@ -284,20 +210,6 @@ int main(int argc, char *argv[]) {
                     Close(server_map[1]);
                     Close(map_server[0]);
                     Close(map_server[1]);
-                    break;
-                case 4:
-                    // Target has spawned
-                    Close(target_server[0]);
-                    Close(target_server[1]);
-                    Close(server_target[0]);
-                    Close(server_target[1]);
-                    break;
-                case 5:
-                    // Obstacles has spawned
-                    Close(obstacles_server[0]);
-                    Close(obstacles_server[1]);
-                    Close(server_obstacles[0]);
-                    Close(server_obstacles[1]);
                     break;
             }
         }
