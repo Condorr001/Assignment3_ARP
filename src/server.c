@@ -66,8 +66,11 @@ int main(int argc, char *argv[]) {
     struct sockaddr_in client_addr;
     uint listener;
     uint addrlen;
+    // Array where to save sockfds
     uint to_identify[2];
+    // Index to use to_identify as a stack
     uint to_identify_index = 0;
+    // Variables where to save sockfds
     uint target_sockfd     = 0;
     uint obstacle_sockfd   = 0;
 
@@ -94,38 +97,62 @@ int main(int argc, char *argv[]) {
         for (uint i = 0; i <= maxfd; i++) {
             if (FD_ISSET(i, &reader)) {
                 int ret = -1;
+                // If the file descriptor that triggered the select is a socket
+                // then read with echo. Otherwise perform normal read
                 if (i == to_identify[0] || i == to_identify[1] ||
                     i == target_sockfd || i == obstacle_sockfd)
                     ret = Read_echo(i, received, MAX_MSG_LEN);
                 else if (i != listener)
                     ret = Read(i, received, MAX_MSG_LEN);
+                // If the number of byte read is 0 then the socket or pipe has
+                // been closed
                 if (ret == 0) {
-                    printf("Pipe to server closed\n");
+                    printf("Pipe or socket to server closed\n");
                     fflush(stdout);
+
+                    // Close this side and remove it from the checked set
                     Close(i);
                     FD_CLR(i, &master);
 
+                    // If it's a socket decrease to_identify_index that is a
+                    // variable that allows the to_identify array to be used
+                    // like a stack
                     if (i == to_identify[0] || i == to_identify[1] ||
                         i == obstacle_sockfd || i == target_sockfd)
                         to_identify_index--;
                 } else {
+                    // Here new connections are opened
                     if (i == listener) {
                         addrlen = sizeof(client_addr);
 
+                        // Here the sockfd that still needs to be identified is
+                        // saved in the array
                         to_identify[to_identify_index] =
                             accept(listener, (struct sockaddr *)&client_addr,
                                    &addrlen);
 
+                        // The sockfd is then added into the fdset
                         FD_SET(to_identify[to_identify_index], &master);
 
+                        // Update maxfd variable
                         if (to_identify[to_identify_index] > maxfd)
                             maxfd = to_identify[to_identify_index];
 
+                        // Keep track of the top of the array
                         to_identify_index++;
+                        // Prevent going out of bounds
+                        if(to_identify_index > 2){
+                            printf("Too many connections. Please restart");
+                            fflush(stdout);
+                            exit(1);
+                        }
                     } else if (i == to_identify[0]) {
                         char dim[MAX_MSG_LEN];
+                        // Send the size of the simulation window
                         sprintf(dim, "%f.3,%f.3", (float)SIMULATION_HEIGHT,
                                 (float)SIMULATION_WIDTH);
+                        // Assign the file descriptor according to the
+                        // initialization message received
                         if (!strcmp(received, "TI")) {
                             Write_echo(i, dim, MAX_MSG_LEN);
                             target_sockfd = i;
@@ -140,8 +167,11 @@ int main(int argc, char *argv[]) {
                         to_identify[0] = 0;
                     } else if (i == to_identify[1]) {
                         char dim[MAX_MSG_LEN];
+                        // Send the size of the simulation window
                         sprintf(dim, "%f.3,%f.3", (float)SIMULATION_HEIGHT,
                                 (float)SIMULATION_WIDTH);
+                        // Assign the file descriptor according to the
+                        // initialization message received
                         if (!strcmp(received, "TI")) {
                             Write_echo(i, dim, MAX_MSG_LEN);
                             target_sockfd = i;
