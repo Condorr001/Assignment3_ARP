@@ -13,7 +13,6 @@
       - [Input](#input)
       - [Target](#target)
       - [Obstacles](#obstacles)
-      - [Watchdog](#watchdog)
     + [Configuration file](#configuration-file)
   * [Other components, directories and files](#other-components-directories-and-files)
   * [Known error cases](#known-error-cases)
@@ -49,17 +48,14 @@ The active components of this project are:
 - Map
 - Drone
 - Input
-- Watchdog (WD)
 - Target
 - Obstacles
 #### Server
 As it can be seen in the architecture scheme, the main role of the **server** process is to read from the pipes and sockets coming from all the processes and distribute messages and information accordingly. Moreover, by means of a *fork()*, it spawns the **map** process. 
 
 The primitives used by the server are:
-- Kill(): used to send a signal to the WD to tell that it's alive
-- Sigaction(): used to initialize the signal handler to handle the signal sent by the WD
 - Fork(): used to create a child process which can spawn the map
-- Select_wmask(): select() used to check the pipes with data and select one of them to read from. It additionally implements a temporary sigmask for SIGUSR1, so that the syscall can be executed without interrupts. Since the execution time of the select() is significantly lower than the WD period for sending signals, this mask should not affect the WD behaviour
+- Select_wmask(): select() used to check the pipes with data and select one of them to read from. It additionally implements a temporary sigmask for SIGUSR1, so that the syscall can be executed without interrupts. 
 - Fopen(), Fclose(): used to open, close and lock/unlock a file located in a specific path (in this case, the log file). Included in our self-defined `logging()` function, whose details can be found in the `utils.c` file
 - Write(), Read(): used to write to and read from the pipes
 - Socket(): used to initialize the sockets, with the server as listener
@@ -77,12 +73,9 @@ score\_increment =
     1, & \text{if } t \geq 20
 \end{cases}
 ```
-where ⌊t⌋ is the time taken by the drone to reach the target starting from the instant when the targets are spawned in the map.
+Where ⌊t⌋ is the time taken by the drone to reach the target starting from the instant when the targets are spawned in the map.
 
 The primitives used by the map are:
-- Kill(): used to send a signal to the WD to tell that it's alive
-- Sigaction(): used to initialize the signal handler to handle the signal sent by the WD
-- Mkfifo(): used to create a FIFO (named pipe) to send its PID to the WD
 - Open(), Close(): used to open and close the file descriptor associated with the FIFO
 - Select(): used to check the server pipe and read from it when new data are available
 - Fopen(), Fclose(), Flock(): used to open, close and lock/unlock a file located in a specific path (in this case, the log file). Included in our self-defined `logging()` function, whose details can be found in the `utils.c` file
@@ -131,9 +124,7 @@ Where:
 + $min$ is the minimum threshold for $\rho(q)$; if it's lower, the function nullifies, so that situations in which an obstacle is spawned in the exact same position as the drone are correctly handled
 
 The primitives used by the drone are:
-- Kill(): used to send a signal to the WD to tell that it's alive
-- Sigaction(): used to initialize the signal handler to handle the signal sent by the WD
-- Select_wmask(): select() used to check the pipes with data and select one of them to read from. It additionally implements a temporary sigmask for SIGUSR1, so that the syscall can be executed without interrupts. Since the execution time of the select() is significantly lower than the WD period for sending signals, this mask should not affect the WD behaviour
+- Select_wmask(): select() used to check the pipes with data and select one of them to read from. It additionally implements a temporary sigmask for SIGUSR1, so that the syscall can be executed without interrupts. 
 - Fopen(), Fclose(), Flock(): used to open, close and lock/unlock a file located in a specific path (in this case, the log file). Included in our self-defined `logging()` function, whose details can be found in the `utils.c` file
 - Write(), Read(): used to write to and read from the pipes
 - Close(): used to safely close the pipes before exiting the process
@@ -157,9 +148,6 @@ The eight external keys can be used to move the drone by adding a force in the r
 Please note that, for the keys to work, you should select the Input window when it appears.
 
 The primitives used by the input are:
-- Kill(): used to send a signal to the WD to tell that it's alive
-- Sigaction(): used to initialize the signal handler to handle the signal sent by the WD
-- Mkfifo(): used to create a FIFO (named pipe) to send its PID to the WD
 - Open(), Close(): used to open and close the file descriptor associated with the FIFO
 - Fopen(), Fclose(), Flock(): used to open, close and lock/unlock a file located in a specific path (in this case, the log file). Included in our self-defined `logging()` function, whose details can be found in the `utils.c` file
 - Write(), Read(): used to write to and read from the pipes
@@ -169,8 +157,6 @@ The primitives used by the input are:
 The **target** process generates a new set of targets to be spawned in the map of an external similar program, communicating through a socket. This happens on two different occasions: when the program is launched and whenever the external server notifies, by sending the string 'GE' through the socket, that all the targets have been reached by the drone. The new set of target coordinates is sent to the external server, in order to be available for the other processes of the external program.
 
 The primitives used by the target are:
-- Kill(): used to send a signal to the WD to tell that it's alive
-- Sigaction(): used to initialize the signal handler to handle the signal sent by the WD
 - Write_echo(), Read_echo(): used to write to and read from the socket and double-check what has been written/read
 - Socket(), Inet_pton(), Connect(): used to manage the socket, particularly to create it, convert the addresses and connect the socket
 
@@ -178,20 +164,13 @@ The primitives used by the target are:
 The **obstacles** process generates, every period, a new set of obstacles to be spawned in the map of an external similar program, communicating through a socket. The new set of obstacles coordinates is sent to the external server through the socket, in order to be available for the other processes of the external program.
 
 The primitives used by the target are:
-- Kill(): used to send a signal to the WD to tell that it's alive
-- Sigaction(): used to initialize the signal handler to handle the signal sent by the WD
 - Select(): used to check the server socket and read from it when new data are available
 - Write_echo(), Read_echo(): used to write to and read from the socket and double-check what has been written/read
 - Socket(), Inet_pton(), Connect(): used to manage the socket, particularly to create it, convert the addresses and connect the socket
 - Close(): also used to safely close the pipes before exiting the process
 
-#### Watchdog
-The **watchdog** is responsible for checking the correct execution of all the other processes. For this purpose, the WD sends the SIGUSR1 signal to all the processes. Then, two checks are made. Firstly, it verifies that the processes are alive by checking if the *kill* syscall returns an error and immediately kills all the processes if this happens.
-Secondly, it verifies that the processes are not frozen by waiting for a SIGUSR2 reply by each process. In case that this signal is not received, meaning
-that the process is frozen, the WD kills all the processes.
-
 ### Configuration file
-The configuration file `drone_parameters.toml` contains all the necessary parameters for the drone dynamics and for the correct behaviour of the other processes.
+The configuration file `drone_parameters.toml` contains all the necessary parameters for the drone dynamics and for the correct behavior of the other processes.
 It has been built by following the [TOML standard](https://toml.io/en/)
 
 ## Other components, directories and files
@@ -223,7 +202,6 @@ The project is structured as follows:
 ├── run.sh ------------------------------------> Script to run the project
 └── src ---------------------------------------> Contains all active components
     ├── CMakeLists.txt
-    ├── WD.c
     ├── drone.c
     ├── input.c
     ├── map.c
