@@ -16,24 +16,10 @@
 #include <unistd.h>
 #include <utils/utils.h>
 
-// WD pid
-pid_t WD_pid;
-
 // Variables set to generate target and obstacles for a set dimension of the
 // simulation window
 float socket_simulation_height = 0;
 float socket_simulation_width  = 0;
-
-// Once the SIGUSR1 is received send back the SIGUSR2 signal
-void signal_handler(int signo, siginfo_t *info, void *context) {
-    // Specifying thhat context is not used
-    (void)(context);
-
-    if (signo == SIGUSR1) {
-        WD_pid = info->si_pid;
-        Kill(WD_pid, SIGUSR2);
-    }
-}
 
 char received[MAX_MSG_LEN];
 
