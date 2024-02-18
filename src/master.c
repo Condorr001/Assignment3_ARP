@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+// This variable controls if the master should spawn obstacle and target processes or not
 bool lab_time = false;
 
 // Function to spawn the processes

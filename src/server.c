@@ -16,20 +16,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-// WD pid
-pid_t WD_pid;
-
-// Once the SIGUSR1 is received send back the SIGUSR2 signal
-void signal_handler(int signo, siginfo_t *info, void *context) {
-    // Specifying that context is unused
-    (void)(context);
-
-    if (signo == SIGUSR1) {
-        WD_pid = info->si_pid;
-        Kill(WD_pid, SIGUSR2);
-    }
-}
-
 int main(int argc, char *argv[]) {
     // Port on which to expose the services
     int PORT = get_param("server", "server_port");

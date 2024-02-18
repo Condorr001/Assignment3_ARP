@@ -117,7 +117,7 @@ int Read(int fd, void *buf, size_t nbytes) {
         printf("%s\n", msg);
         fflush(stdout);
         logging(LOG_ERROR, msg);
-        sleep(100);
+        getchar();
         exit(EXIT_FAILURE);
     }
     return ret;
@@ -146,7 +146,7 @@ int Write(int fd, void *buf, size_t nbytes) {
         printf("%s\n", msg);
         fflush(stdout);
         logging(LOG_ERROR, msg);
-        sleep(100);
+        getchar();
         exit(EXIT_FAILURE);
     }
     return ret;

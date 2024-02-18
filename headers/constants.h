@@ -39,10 +39,6 @@
 
 #define OBSTACLES_SPAWN_PERIOD 20
 
-// Defining the amount to sleep between any two consequent signals to the
-// processes
-#define WD_SLEEP_PERIOD 1
-
 //Address for sockets
 #define SERVER_ADDRESS "127.0.0.1"
 
