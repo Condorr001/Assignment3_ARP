@@ -16,6 +16,7 @@
     + [Configuration file](#configuration-file)
   * [Other components, directories and files](#other-components-directories-and-files)
   * [Known error cases](#known-error-cases)
+  * [Communicating with other projects](#communicating-with-other-projects)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -220,3 +221,9 @@ updated position but the `map-end` of the `server-map` pipe has been closed. Thi
 cannot be avoided in a "crash" event meaning when a process closes unexpectedly
 like in this case. We wanted to add this section in order to emphasize that this
 is not a not handled error but a known and not avoidable situation in this case.
+
+## Communicating with other projects
+The project is set up out of the box to work with itself. In order to allow 
+splitting the interface and target, obstacles you need to set lab_time to 
+true in master.c and run the ```run.sh``` script. Now target and obstacles 
+processes will not be started.
