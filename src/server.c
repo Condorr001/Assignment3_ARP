@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
                     } else if (i == to_identify[0]) {
                         char dim[MAX_MSG_LEN];
                         // Send the size of the simulation window
-                        sprintf(dim, "%f.3,%f.3", (float)SIMULATION_HEIGHT,
+                        sprintf(dim, "%.3f,%.3f", (float)SIMULATION_HEIGHT,
                                 (float)SIMULATION_WIDTH);
                         // Assign the file descriptor according to the
                         // initialization message received
@@ -168,7 +168,7 @@ int main(int argc, char *argv[]) {
                     } else if (i == to_identify[1]) {
                         char dim[MAX_MSG_LEN];
                         // Send the size of the simulation window
-                        sprintf(dim, "%f.3,%f.3", (float)SIMULATION_HEIGHT,
+                        sprintf(dim, "%.3f,%.3f", (float)SIMULATION_HEIGHT,
                                 (float)SIMULATION_WIDTH);
                         // Assign the file descriptor according to the
                         // initialization message received

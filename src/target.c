@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 
     // Reading the dimensions of the window from the string sent by the
     // server
-    sscanf(dimensions, "%f.3,%f.3", &socket_simulation_width,
+    sscanf(dimensions, "%f,%f", &socket_simulation_width,
            &socket_simulation_height);
 
     // coordinates of target
