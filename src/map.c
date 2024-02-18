@@ -161,21 +161,6 @@ void find_spot(int *old_y, int *old_x, int drone_y, int drone_x) {
 }
 
 int main(int argc, char *argv[]) {
-    // Signal declaration
-    struct sigaction sa;
-    memset(&sa, 0, sizeof(sa));
-
-    // Setting the signal handler
-    sa.sa_sigaction = signal_handler;
-    sigemptyset(&sa.sa_mask);
-    // Setting flags
-    // The SA_RESTART flag is used to restart all those syscalls that can get
-    // interrupted by signals
-    sa.sa_flags = SA_SIGINFO | SA_RESTART;
-
-    // Enabling the handler with the specified flags
-    Sigaction(SIGUSR1, &sa, NULL);
-
     int to_server, from_server;
     if (argc == 3) {
         sscanf(argv[1], "%d", &to_server);
@@ -191,22 +176,6 @@ int main(int argc, char *argv[]) {
     int score_increment = 0;
     // time when the target are spawned
     time_t start_time;
-
-    // Named pipe (fifo) to send the pid to the WD
-    Mkfifo(FIFO1_PATH, 0666);
-
-    // Getting the map pid
-    int map_pid = getpid();
-    char map_pid_str[10];
-
-    // Here the pid of the map process is passed to the WD
-    sprintf(map_pid_str, "%d", map_pid);
-
-    // Writing to the fifo the previously formatted string
-    int fd;
-    fd = Open(FIFO1_PATH, O_WRONLY);
-    Write(fd, map_pid_str, strlen(map_pid_str) + 1);
-    Close(fd);
 
     // Setting up the struct in which to store the position of the drone
     // in order to calculate the current position on the screen of the drone

@@ -17,20 +17,6 @@
 #include <time.h>
 #include <unistd.h>
 
-// WD pid
-pid_t WD_pid = -1;
-
-// Once the SIGUSR1 is received send back the SIGUSR2 signal
-void signal_handler(int signo, siginfo_t *info, void *context) {
-    // Specifying that context is unused
-    (void)(context);
-
-    if (signo == SIGUSR1) {
-        WD_pid = info->si_pid;
-        Kill(WD_pid, SIGUSR2);
-    }
-}
-
 // Create the outer border of the window
 WINDOW *input_display_setup(int height, int width, int starty, int startx) {
     WINDOW *local_win;
@@ -216,22 +202,6 @@ bool update_force(struct force *to_update, int input, float step,
 }
 
 int main(int argc, char *argv[]) {
-
-    // Signal declaration
-    struct sigaction sa;
-    memset(&sa, 0, sizeof(sa));
-
-    // Setting the signal handler
-    sa.sa_sigaction = signal_handler;
-    sigemptyset(&sa.sa_mask);
-    // Setting flags
-    // The SA_RESTART flag is used to restart all those syscalls that can get
-    // interrupted by signals
-    sa.sa_flags = SA_SIGINFO | SA_RESTART;
-
-    // Enabling the handler with the specified flags
-    Sigaction(SIGUSR1, &sa, NULL);
-
     // Specifying that argc and argv are unused variables
     int to_drone_pipe, to_server_pipe, from_server_pipe;
     if (argc == 4) {
@@ -243,19 +213,6 @@ int main(int argc, char *argv[]) {
         getchar();
         exit(1);
     }
-
-    // Named pipe (fifo) to send the pid to the WD
-    int fd;
-    Mkfifo(FIFO2_PATH, 0666);
-
-    // Getting the input pid
-    int input_pid = getpid();
-    char input_pid_str[10];
-    sprintf(input_pid_str, "%d", input_pid);
-
-    fd = Open(FIFO2_PATH, O_WRONLY);
-    Write(fd, input_pid_str, strlen(input_pid_str) + 1);
-    Close(fd);
 
     // The max value that the force applied to the drone
     // for each axis is read.
@@ -358,12 +315,6 @@ int main(int argc, char *argv[]) {
         // If the user presses the p key then it's time for all the processes to
         // die in a safe way
         if (input == 'p') {
-            // This is not very elegant but the watchdog has to be killed in
-            // order to not trigger an emergency shutdown due to the lack of the
-            // already killed processes
-            if (WD_pid != -1)
-                Kill(WD_pid, SIGKILL);
-
             // Signal the server of the received STOP signal
             Write(to_server_pipe, "STOP", MAX_MSG_LEN);
             break;

@@ -6,8 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/file.h>
+#include <unistd.h>
 
-#define MAX_PROCESSES 5
+#define MAX_PROCESSES 10
 #define MAX_VALUES_FOR_PROCESS 30
 #define MAX_PROCESS_NAME_LEN 30
 #define MAX_LEN_PROCESS_ATTR 50
@@ -241,4 +242,29 @@ void remove_target(int index, struct pos *objects_arr, int objects_num) {
         objects_arr[i].x = objects_arr[i + 1].x;
         objects_arr[i].y = objects_arr[i + 1].y;
     }
+}
+
+void Write_echo(int fd, void *buf, size_t num) {
+    char aux_buf[MAX_MSG_LEN];
+    Write(fd, buf, num);
+    Read(fd, aux_buf, num);
+    if (strcmp(aux_buf, buf)) {
+        char msg[2023];
+        sprintf(msg,
+                "Error on executing Write_echo pid: %d, mismatched strings: %s "
+                "!= %s, awaiting termination from WD",
+                getpid(), aux_buf, (char *)buf);
+        printf("%s\n", msg);
+        fflush(stdout);
+        logging(LOG_ERROR, msg);
+        pause();
+        exit(EXIT_FAILURE);
+    }
+}
+
+int Read_echo(int fd, void *buf, size_t num) {
+    int ret;
+    ret = Read(fd, buf, num);
+    Write(fd, buf, num);
+    return ret;
 }

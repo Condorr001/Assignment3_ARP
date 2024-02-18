@@ -1,7 +1,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#define NUM_PROCESSES 7
+#define NUM_PROCESSES 6
 
 #define SHMOBJ_PATH "/shm_server"
 #define SEM_PATH_POSITION "/sem_position"
@@ -43,9 +43,7 @@
 // processes
 #define WD_SLEEP_PERIOD 1
 
-// Port for sockets
-#define PORT 8080
 //Address for sockets
-#define SOCKET_ADDRESS "127.0.0.1"
+#define SERVER_ADDRESS "127.0.0.1"
 
 #endif // !CONSTANTS_H

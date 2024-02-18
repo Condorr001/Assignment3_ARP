@@ -1,5 +1,6 @@
 #include "constants.h"
 #include "wrapFuncs/wrapFunc.h"
+#include <arpa/inet.h>
 #include <curses.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -8,20 +9,20 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/select.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 #include <utils/utils.h>
-#include <string.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
 
 // WD pid
 pid_t WD_pid;
 
-// Boolean to decide whether to use pipes or sockets
-bool socket_use = false;
+// Variables set to generate target and obstacles for a set dimension of the
+// simulation window
+float socket_simulation_height = 0;
+float socket_simulation_width  = 0;
 
 // Once the SIGUSR1 is received send back the SIGUSR2 signal
 void signal_handler(int signo, siginfo_t *info, void *context) {
@@ -37,53 +38,42 @@ void signal_handler(int signo, siginfo_t *info, void *context) {
 char received[MAX_MSG_LEN];
 
 int main(int argc, char *argv[]) {
-    // Signal declaration
-    struct sigaction sa;
-    memset(&sa, 0, sizeof(sa));
+    // Specifying that argc and argv are not used
+    (void)argc;
+    (void)argv;
+    
+    // Server port to which to connect
+    int PORT = get_param("target", "server_port");
 
-    // Setting the signal handler
-    sa.sa_sigaction = signal_handler;
-    // Resetting the mask
-    sigemptyset(&sa.sa_mask);
-    // Setting flags
-    // The SA_RESTART flag has been added to restart all those syscalls that can
-    // get interrupted by signals
-    sa.sa_flags = SA_SIGINFO | SA_RESTART;
-    Sigaction(SIGUSR1, &sa, NULL);
+    // socket initialization
+    int server_fd;
 
-    // Specifying that argc and argv are unused variables
-    int to_server_pipe, from_server_pipe;
+    // Wait for the server to be up
+    sleep(1);
+    struct sockaddr_in server_addr;
 
-    //socket initialization
-    int client_fd;
-    if (socket_use) {
-        struct sockaddr_in server_addr;
+    // create the socket
+    server_fd = Socket(AF_INET, SOCK_STREAM, 0);
 
-        //create the socket
-        client_fd = Socket(AF_INET, SOCK_STREAM, 0);
+    // defining the server address for the socket
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port   = htons(PORT);
 
-        //defining the server address for the socket
-        server_addr.sin_family = AF_INET;
-        server_addr.sin_port = htons(PORT);
+    // convert addresses from text to binary
+    Inet_pton(AF_INET, SERVER_ADDRESS, &server_addr.sin_addr);
 
-        //convert addresses from text to binary
-        Inet_pton(AF_INET, SOCKET_ADDRESS, &server_addr.sin_addr);
+    // connect the socket to the specified address
+    Connect(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
 
-        //connect the socket to the specified address
-        Connect(client_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
-    }
+    Write_echo(server_fd, "OI", MAX_MSG_LEN);
 
-    else {
-        //pipes initialization
-        if (argc == 3) {
-            sscanf(argv[1], "%d", &to_server_pipe);
-            sscanf(argv[2], "%d", &from_server_pipe);
-        } else {
-            printf("Wrong number of arguments in obstacles\n");
-            getchar();
-            exit(1);
-        }
-    }
+    // Get dimensions for which to generate obstacles
+    char dimensions[MAX_MSG_LEN];
+    Read_echo(server_fd, dimensions, MAX_MSG_LEN);
+
+    // Parsing the string
+    sscanf(dimensions, "%f.3,%f.3", &socket_simulation_height,
+           &socket_simulation_width);
 
     // coordinates of obstacles
     float obstacle_x, obstacle_y;
@@ -97,11 +87,9 @@ int main(int argc, char *argv[]) {
     srandom((unsigned int)time(NULL) * 33);
 
     fd_set reader, master;
-    if (!socket_use) {
-        FD_ZERO(&reader);
-        FD_ZERO(&master);
-        FD_SET(from_server_pipe, &master);
-    }
+    FD_ZERO(&reader);
+    FD_ZERO(&master);
+    FD_SET(server_fd, &master);
 
     struct timeval select_timeout;
     select_timeout.tv_sec  = OBSTACLES_SPAWN_PERIOD;
@@ -117,18 +105,16 @@ int main(int argc, char *argv[]) {
                 strcat(to_send, "|");
             }
             // The obstacle has to stay inside the simulation window
-            obstacle_x = random() % SIMULATION_WIDTH;
-            obstacle_y = random() % SIMULATION_HEIGHT;
+            obstacle_x = (float)random() /
+                         (float)((float)RAND_MAX / socket_simulation_height);
+            obstacle_y = (float)random() /
+                         (float)((float)RAND_MAX / socket_simulation_width);
             sprintf(aux_to_send, "%.3f,%.3f", obstacle_x, obstacle_y);
             strcat(to_send, aux_to_send);
         }
 
-        if (socket_use)
-            //send the obstacles coordinates to the other program
-            Send(client_fd, to_send, MAX_MSG_LEN, 0);
-        else
-            // Sending to the server
-            Write(to_server_pipe, to_send, MAX_MSG_LEN);
+        // send the obstacles coordinates to the other program
+        Write_echo(server_fd, to_send, MAX_MSG_LEN);
 
         // Resetting to_send string
         sprintf(to_send, "O");
@@ -136,42 +122,30 @@ int main(int argc, char *argv[]) {
         // Logging the correct generation
         logging(LOG_INFO, "Obstacles process generated a new set of obstacles");
 
-        if (!socket_use) {
-            // Resetting the fd_sets
-            reader = master;
-            int ret;
-            do {
-                ret = Select(from_server_pipe + 1, &reader, NULL, NULL,
-                            &select_timeout);
-            } while (ret == -1);
-            // Resetting the timeout
-            select_timeout.tv_sec  = OBSTACLES_SPAWN_PERIOD;
-            select_timeout.tv_usec = 0;
-            if (FD_ISSET(from_server_pipe, &reader)) {
-                int read_ret = Read(from_server_pipe, received, MAX_MSG_LEN);
-                if (read_ret == 0) {
-                    // If closed pipe close fd
-                    Close(from_server_pipe);
-                    FD_CLR(from_server_pipe, &master);
-                    logging(LOG_WARN, "Pipe to obstacles closed");
-                }
-                // If STOP received then stop everything
-                if (!strcmp(received, "STOP")) {
-                    break;
-                }
+        // Resetting the fd_seta
+        reader = master;
+        int ret;
+        do {
+            ret = Select(server_fd + 1, &reader, NULL, NULL, &select_timeout);
+        } while (ret == -1);
+        // Resetting the timeout
+        select_timeout.tv_sec  = OBSTACLES_SPAWN_PERIOD;
+        select_timeout.tv_usec = 0;
+        if (FD_ISSET(server_fd, &reader)) {
+            int read_ret;
+            read_ret = Read_echo(server_fd, received, MAX_MSG_LEN);
+            if (read_ret == 0) {
+                // If closed pipe close fd
+                Close(server_fd);
+                FD_CLR(server_fd, &master);
+                logging(LOG_WARN, "Pipe to obstacles closed");
             }
-        }
-
-        else {
-            // Resetting the timeout
-            select_timeout.tv_sec  = OBSTACLES_SPAWN_PERIOD;
-            select_timeout.tv_usec = 0;
-
-            //TO DO: if STOP for server is received, break
+            // If STOP received then stop everything
+            if (!strcmp(received, "STOP")) {
+                break;
+            }
         }
     }
 
-    // Cleaning up
-    Close(to_server_pipe);
     return 0;
 }

@@ -16,20 +16,6 @@
 #include <time.h>
 #include <unistd.h>
 
-// WD pid
-pid_t WD_pid;
-
-// Once the SIGUSR1 is received send back the SIGUSR2 signal
-void signal_handler(int signo, siginfo_t *info, void *context) {
-    // Specifying thhat context is not used
-    (void)(context);
-
-    if (signo == SIGUSR1) {
-        WD_pid = info->si_pid;
-        Kill(WD_pid, SIGUSR2);
-    }
-}
-
 // This function returns the border effect given the general
 // function given in the docs folder of the project. All the parameters can be
 // modified from the configuration file.
@@ -42,21 +28,6 @@ float repulsive_force(float distance, float function_scale,
 }
 
 int main(int argc, char *argv[]) {
-    // Signal declaration
-    struct sigaction sa;
-    memset(&sa, 0, sizeof(sa));
-
-    // Setting the signal handler
-    sa.sa_sigaction = signal_handler;
-    // Resetting the mask
-    sigemptyset(&sa.sa_mask);
-    // Setting flags
-    // The SA_RESTART flag has been added to restart all those syscalls that can
-    // get interrupted by signals
-    sa.sa_flags = SA_SIGINFO | SA_RESTART;
-
-    Sigaction(SIGUSR1, &sa, NULL);
-
     // Specifying that argc and argv are unused variables
     int from_input_pipe, from_server_pipe, to_server_pipe;
 
